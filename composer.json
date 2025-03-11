@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "abnerdsr/clone-tabnews-laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Clone do tabnews para o curso.dev",
     "keywords": [
         "laravel",
         "framework",
