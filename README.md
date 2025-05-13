@@ -11,21 +11,31 @@ Node 22
 ## Instalando
 
 Dependencias
+
 ```sh
 composer install
 ```
 
 Ajustes necessários
+
 ```sh
 composer dev:install
 ```
 
 Rodar servidor
+
 ```sh
 composer run dev
 ```
 
 Acessar aplicação em
+
 ```
+php artisan serve
+
 http://localhost:8000
+```
+
+```
+npm run dev
 ```
