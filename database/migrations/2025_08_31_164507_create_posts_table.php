@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('coin')->default('0 tabcoins');
             $table->string('comments')->default('0 comentários');
             $table->string('author');
+            $table->text('content');
             $table->string('time')->nullable();
             $table->timestamps();
         });
