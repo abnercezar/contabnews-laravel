@@ -1,0 +1,68 @@
+<template>
+    <header class="bg-[#00244a] text-white py-4 shadow-md min-h-[80px]">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <div class="flex items-center gap-8">
+                <h1 class="logo flex items-center text-3xl font-bold mr-8 ml-4">
+                    <span class="mr-4">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="#daa520"
+                            viewBox="0 0 24 24"
+                            width="42"
+                            height="42"
+                        >
+                            <path
+                                d="M19 3H5a2 2 0 0 0-2 2v14a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2zm0 2v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5h14zm-2 3H7v2h10V8zm0 4H7v2h10v-2zm-4 4H7v2h6v-2z"
+                            />
+                        </svg>
+                    </span>
+                    Contab News
+                </h1>
+                <div class="nav-items flex gap-2">
+                    <button
+                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
+                    >
+                        Publicações
+                    </button>
+                    <button
+                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
+                    >
+                        Comentários
+                    </button>
+                    <button
+                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
+                    >
+                        Classificados
+                    </button>
+                    <button
+                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
+                    >
+                        Todos
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="relative flex items-center">
+                    <input
+                        type="text"
+                        class="search-input px-3 py-2 rounded border border-gray-300 text-sm focus:border-[#ff7b00]"
+                        placeholder="Pesquisar..."
+                    />
+                    <span
+                        class="absolute right-2 text-gray-500 text-lg pointer-events-none"
+                        >🔍</span
+                    >
+                </div>
+                <div class="plus-icon text-xl cursor-pointer">+</div>
+                <div class="notifications text-lg cursor-pointer">🟢 0</div>
+                <div class="notifications text-lg cursor-pointer">🔴 0</div>
+                <div class="hamburger text-xl cursor-pointer ml-4 mr-4">☰</div>
+            </div>
+        </div>
+    </header>
+</template>
+<script>
+export default {
+    name: "Header",
+};
+</script>
