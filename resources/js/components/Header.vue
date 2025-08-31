@@ -22,28 +22,7 @@
                     </span>
                     <span>Contab News</span>
                 </h1>
-                <div class="nav-items flex gap-4">
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Publicações
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Comentários
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Classificados
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Todos
-                    </button>
-                </div>
+                <NavButtons />
             </div>
             <div class="flex items-center gap-6 justify-center flex-1">
                 <div class="relative flex items-center">
@@ -68,26 +47,23 @@
             </div>
             <template v-if="!isLoggedIn">
                 <div class="flex gap-4 justify-center flex-1">
-                    <button
-                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
-                        @click="() => (window.location.href = '/login')"
-                    >
-                        Login
-                    </button>
-                    <button
-                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
-                        @click="() => (window.location.href = '/register')"
-                    >
-                        Cadastrar
-                    </button>
+                    <AppButton :to="'/login'">Login</AppButton>
+                    <AppButton :to="'/register'">Cadastrar</AppButton>
                 </div>
             </template>
         </div>
     </header>
 </template>
 <script>
+import AppButton from "./AppButton.vue";
+import NavButtons from "./NavButtons.vue";
+
 export default {
     name: "Header",
+    components: {
+        AppButton,
+        NavButtons,
+    },
     data() {
         return {
             isLoggedIn: false, // Troque para true para simular usuário logado
