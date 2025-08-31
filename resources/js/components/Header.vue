@@ -18,7 +18,7 @@ export default {
     },
     data() {
         return {
-            isLoggedIn: true, // Troque para true para simular usuário logado
+            isLoggedIn: false, // Troque para true para simular usuário logado
         };
     },
 };
@@ -85,8 +85,6 @@ export default {
             </div>
             <template v-if="!isLoggedIn">
                 <div class="flex gap-4 justify-center flex-1">
-                    <AppButton :to="'/login'">Login</AppButton>
-                    <AppButton :to="'/register'">Cadastrar</AppButton>
                     <AppButton :to="'/login'">Login</AppButton>
                     <AppButton :to="'/register'">Cadastrar</AppButton>
                 </div>
