@@ -1,8 +1,12 @@
 <template>
     <header class="bg-[#00244a] text-white py-4 shadow-md min-h-[80px]">
-        <div class="container mx-auto flex justify-between items-center px-4">
-            <div class="flex items-center gap-8">
-                <h1 class="logo flex items-center text-3xl font-bold mr-8 ml-4">
+        <div
+            class="container mx-auto flex items-center px-4 gap-8 justify-center"
+        >
+            <div class="flex items-center gap-8 justify-center flex-1">
+                <h1
+                    class="logo flex items-center text-3xl font-bold mr-8 ml-4 whitespace-nowrap"
+                >
                     <span class="mr-4">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -16,9 +20,9 @@
                             />
                         </svg>
                     </span>
-                    Contab News
+                    <span>Contab News</span>
                 </h1>
-                <div class="nav-items flex gap-2">
+                <div class="nav-items flex gap-4">
                     <button
                         class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
                     >
@@ -41,7 +45,7 @@
                     </button>
                 </div>
             </div>
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-6 justify-center flex-1">
                 <div class="relative flex items-center">
                     <input
                         type="text"
@@ -53,16 +57,41 @@
                         >🔍</span
                     >
                 </div>
-                <div class="plus-icon text-xl cursor-pointer">+</div>
-                <div class="notifications text-lg cursor-pointer">🟢 0</div>
-                <div class="notifications text-lg cursor-pointer">🔴 0</div>
-                <div class="hamburger text-xl cursor-pointer ml-4 mr-4">☰</div>
+                <template v-if="isLoggedIn">
+                    <div class="plus-icon text-xl cursor-pointer">+</div>
+                    <div class="notifications text-lg cursor-pointer">🟢 0</div>
+                    <div class="notifications text-lg cursor-pointer">🔴 0</div>
+                    <div class="hamburger text-xl cursor-pointer ml-4 mr-4">
+                        ☰
+                    </div>
+                </template>
             </div>
+            <template v-if="!isLoggedIn">
+                <div class="flex gap-4 justify-center flex-1">
+                    <button
+                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
+                        @click="() => (window.location.href = '/login')"
+                    >
+                        Login
+                    </button>
+                    <button
+                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
+                        @click="() => (window.location.href = '/register')"
+                    >
+                        Cadastrar
+                    </button>
+                </div>
+            </template>
         </div>
     </header>
 </template>
 <script>
 export default {
     name: "Header",
+    data() {
+        return {
+            isLoggedIn: false, // Troque para true para simular usuário logado
+        };
+    },
 };
 </script>

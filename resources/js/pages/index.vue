@@ -4,7 +4,7 @@ import PostList from "../components/PostList.vue";
 import Footer from "../components/Footer.vue";
 
 export default {
-    name: "HomePage",
+    name: "Index",
     components: {
         Header,
         PostList,
