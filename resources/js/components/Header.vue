@@ -23,6 +23,7 @@
                     <span>Contab News</span>
                 </h1>
                 <NavButtons />
+                <NavButtons />
             </div>
             <div class="flex items-center gap-6 justify-center flex-1">
                 <div class="relative flex items-center">
@@ -60,6 +61,8 @@
             </div>
             <template v-if="!isLoggedIn">
                 <div class="flex gap-4 justify-center flex-1">
+                    <AppButton :to="'/login'">Login</AppButton>
+                    <AppButton :to="'/register'">Cadastrar</AppButton>
                     <AppButton :to="'/login'">Login</AppButton>
                     <AppButton :to="'/register'">Cadastrar</AppButton>
                 </div>
