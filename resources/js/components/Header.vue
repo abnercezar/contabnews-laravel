@@ -1,3 +1,28 @@
+<script>
+import AppButton from "./AppButton.vue";
+import NavButtons from "./NavButtons.vue";
+import SearchIcon from "./SearchIcon.vue";
+import PlusIcon from "./PlusIcon.vue";
+import HamburgerIcon from "./HamburgerIcon.vue";
+import TabCoinIcon from "./TabCoinIcon.vue";
+
+export default {
+    name: "Header",
+    components: {
+        AppButton,
+        NavButtons,
+        SearchIcon,
+        PlusIcon,
+        HamburgerIcon,
+        TabCoinIcon,
+    },
+    data() {
+        return {
+            isLoggedIn: true, // Troque para true para simular usuário logado
+        };
+    },
+};
+</script>
 <template>
     <header class="bg-[#00244a] text-white py-4 shadow-md min-h-[80px]">
         <div
@@ -67,28 +92,3 @@
         </div>
     </header>
 </template>
-<script>
-import AppButton from "./AppButton.vue";
-import NavButtons from "./NavButtons.vue";
-import SearchIcon from "./SearchIcon.vue";
-import PlusIcon from "./PlusIcon.vue";
-import HamburgerIcon from "./HamburgerIcon.vue";
-import TabCoinIcon from "./TabCoinIcon.vue";
-
-export default {
-    name: "Header",
-    components: {
-        AppButton,
-        NavButtons,
-        SearchIcon,
-        PlusIcon,
-        HamburgerIcon,
-        TabCoinIcon,
-    },
-    data() {
-        return {
-            isLoggedIn: true, // Troque para true para simular usuário logado
-        };
-    },
-};
-</script>
