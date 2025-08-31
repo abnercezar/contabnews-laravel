@@ -48,7 +48,6 @@ export default {
                     <span>Contab News</span>
                 </h1>
                 <NavButtons />
-                <NavButtons />
             </div>
             <div class="flex items-center gap-6 justify-center flex-1">
                 <div class="relative flex items-center">
