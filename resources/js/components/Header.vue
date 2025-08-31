@@ -22,28 +22,7 @@
                     </span>
                     <span>Contab News</span>
                 </h1>
-                <div class="nav-items flex gap-4">
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Publicações
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Comentários
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Classificados
-                    </button>
-                    <button
-                        class="nav-button bg-[#daa520] text-white px-4 py-2 rounded hover:bg-[#d3ad71] text-sm"
-                    >
-                        Todos
-                    </button>
-                </div>
+                <NavButtons />
             </div>
             <div class="flex items-center gap-6 justify-center flex-1">
                 <div class="relative flex items-center">
@@ -53,44 +32,62 @@
                         placeholder="Pesquisar..."
                     />
                     <span
-                        class="absolute right-2 text-gray-500 text-lg pointer-events-none"
-                        >🔍</span
+                        class="absolute right-2 text-gray-500 pointer-events-none"
                     >
+                        <SearchIcon />
+                    </span>
                 </div>
                 <template v-if="isLoggedIn">
-                    <div class="plus-icon text-xl cursor-pointer">+</div>
-                    <div class="notifications text-lg cursor-pointer">🟢 0</div>
-                    <div class="notifications text-lg cursor-pointer">🔴 0</div>
+                    <div class="plus-icon text-xl cursor-pointer">
+                        <PlusIcon />
+                    </div>
+                    <div class="tabcoin flex items-center ml-2">
+                        <TabCoinIcon />
+                        <span class="ml-1 text-xs font-bold text-blue-700"
+                            >0 TabCoin</span
+                        >
+                    </div>
+                    <div class="tabcash flex items-center ml-2">
+                        <TabCoinIcon color="#daa520" />
+                        <span class="ml-1 text-xs font-bold text-yellow-600"
+                            >0 TabCash</span
+                        >
+                    </div>
                     <div class="hamburger text-xl cursor-pointer ml-4 mr-4">
-                        ☰
+                        <HamburgerIcon />
                     </div>
                 </template>
             </div>
             <template v-if="!isLoggedIn">
                 <div class="flex gap-4 justify-center flex-1">
-                    <button
-                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
-                        @click="() => (window.location.href = '/login')"
-                    >
-                        Login
-                    </button>
-                    <button
-                        class="nav-button bg-[#00244a] border border-[#daa520] text-[#daa520] px-4 py-2 rounded hover:bg-[#daa520] hover:text-white text-sm transition"
-                        @click="() => (window.location.href = '/register')"
-                    >
-                        Cadastrar
-                    </button>
+                    <AppButton :to="'/login'">Login</AppButton>
+                    <AppButton :to="'/register'">Cadastrar</AppButton>
                 </div>
             </template>
         </div>
     </header>
 </template>
 <script>
+import AppButton from "./AppButton.vue";
+import NavButtons from "./NavButtons.vue";
+import SearchIcon from "./SearchIcon.vue";
+import PlusIcon from "./PlusIcon.vue";
+import HamburgerIcon from "./HamburgerIcon.vue";
+import TabCoinIcon from "./TabCoinIcon.vue";
+
 export default {
     name: "Header",
+    components: {
+        AppButton,
+        NavButtons,
+        SearchIcon,
+        PlusIcon,
+        HamburgerIcon,
+        TabCoinIcon,
+    },
     data() {
         return {
-            isLoggedIn: false, // Troque para true para simular usuário logado
+            isLoggedIn: true, // Troque para true para simular usuário logado
         };
     },
 };
