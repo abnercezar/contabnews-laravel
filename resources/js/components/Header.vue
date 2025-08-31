@@ -87,6 +87,8 @@ export default {
                 <div class="flex gap-4 justify-center flex-1">
                     <AppButton :to="'/login'">Login</AppButton>
                     <AppButton :to="'/register'">Cadastrar</AppButton>
+                    <AppButton :to="'/login'">Login</AppButton>
+                    <AppButton :to="'/register'">Cadastrar</AppButton>
                 </div>
             </template>
         </div>
