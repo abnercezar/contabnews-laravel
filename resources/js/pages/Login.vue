@@ -2,85 +2,100 @@
     <div
         class="min-h-screen flex flex-col justify-center items-center bg-gray-50"
     >
-        <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-            <h1 class="text-2xl font-bold mb-6 text-center">Login</h1>
-            <form @submit.prevent="login">
-                <div class="mb-4">
-                    <label
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        for="email"
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+            <form @submit.prevent="login" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1"
                         >Seu Email</label
                     >
                     <input
-                        v-model="email"
-                        id="email"
+                        v-model="form.email"
                         type="email"
-                        required
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a]"
                         placeholder="Digite seu email"
-                        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                        required
                     />
                 </div>
-                <div class="mb-6">
-                    <label
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        for="password"
-                        >Senha</label
-                    >
+                <div>
+                    <label class="block text-sm font-medium mb-1">Senha</label>
                     <input
-                        v-model="password"
-                        id="password"
+                        v-model="form.password"
                         type="password"
-                        required
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a]"
                         placeholder="Digite sua senha"
-                        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                        required
                     />
                 </div>
                 <button
                     type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition"
+                    :disabled="loading"
+                    class="w-full bg-[#00244a] text-white py-2 rounded font-bold hover:bg-[#001a33] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Entrar
+                    {{ loading ? "Entrando..." : "Entrar" }}
                 </button>
+                <div v-if="error" class="text-red-600 text-sm mt-2">
+                    {{ error }}
+                </div>
+                <div v-if="success" class="text-green-600 text-sm mt-2">
+                    {{ success }}
+                </div>
             </form>
-            <div class="mt-6 flex flex-col gap-2 text-sm text-center">
-                <a href="/register" class="text-blue-600 hover:underline"
-                    >Novo no ContabNews? Crie sua conta aqui.</a
+            <div class="mt-4 text-sm text-center">
+                Novo no TabNews?
+                <a href="/register" class="underline text-[#00244a]"
+                    >Crie sua conta aqui.</a
                 >
-                <a href="/forgot-password" class="text-blue-600 hover:underline"
-                    >Esqueceu sua senha? Clique aqui.</a
-                >
+            </div>
+            <div class="mt-2 text-sm text-center">
+                Esqueceu sua senha?
+                <a href="#" class="underline text-[#00244a]">Clique aqui.</a>
             </div>
         </div>
-        <footer class="mt-8 text-xs text-gray-500 text-center">
-            <div>© 2025 ContabNews</div>
-            <div class="flex flex-wrap gap-3 justify-center mt-2">
-                <a href="/contato" class="hover:underline">Contato</a>
-                <a href="/faq" class="hover:underline">FAQ</a>
-                <a
-                    href="https://github.com/abnercezar/contabnews-laravel"
-                    target="_blank"
-                    class="hover:underline"
-                    >GitHub</a
-                >
-                <a href="/museu" class="hover:underline">Museu</a>
-                <a href="/rss" class="hover:underline">RSS</a>
-                <a href="/sobre" class="hover:underline">Sobre</a>
-            </div>
+        <footer class="mt-8 text-center text-xs text-gray-500">
+            © 2025 TabNews &nbsp;|&nbsp;
+            <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
+            <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
+            <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
+            <a href="#" class="underline">Museu</a> &nbsp;|&nbsp;
+            <a href="#" class="underline">RSS</a> &nbsp;|&nbsp;
+            <a href="#" class="underline">Sobre</a>
         </footer>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
-const email = ref("");
-const password = ref("");
+const form = reactive({
+    email: "",
+    password: "",
+});
+const loading = ref(false);
+const error = ref("");
+const success = ref("");
 
-function login() {
-    // Aqui você pode integrar com a API de login
-    // Exemplo:
-    // axios.post('/api/login', { email: email.value, password: password.value })
-    //   .then(...)
+async function login() {
+    error.value = "";
+    success.value = "";
+    loading.value = true;
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            success.value = data.message || "Login realizado com sucesso!";
+            // Aqui você pode salvar o token, redirecionar, etc.
+        } else {
+            error.value = data.message || "Erro ao fazer login.";
+        }
+    } catch (e) {
+        error.value = "Erro de conexão com o servidor.";
+    }
+    loading.value = false;
 }
 </script>
 

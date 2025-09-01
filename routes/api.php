@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserRegisterController;
 
 Route::apiResource('posts', PostController::class, [
     'only' => ['index', 'show']
@@ -16,3 +17,4 @@ Route::middleware('auth.token')->group(function () {
 });
 
 Route::post('login', [AuthController::class, 'login']);
+Route::post('/register', [UserRegisterController::class, 'store']);

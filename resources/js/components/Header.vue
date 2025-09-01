@@ -18,7 +18,7 @@ export default {
     },
     data() {
         return {
-            isLoggedIn: false, // Troque para true para simular usuário logado
+            isLoggedIn: true, // Troque para true para simular usuário logado
         };
     },
 };
@@ -53,7 +53,7 @@ export default {
                 <div class="relative flex items-center">
                     <input
                         type="text"
-                        class="search-input px-3 py-2 rounded border border-gray-300 text-sm focus:border-[#ff7b00]"
+                        class="search-input px-3 py-2 rounded border border-gray-300 text-sm focus:border-[#ff7b00] w-72 max-w-full"
                         placeholder="Pesquisar..."
                     />
                     <span
