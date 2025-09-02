@@ -18,8 +18,12 @@ export default {
     },
     data() {
         return {
-            isLoggedIn: true, // Troque para true para simular usuário logado
+            isLoggedIn: false,
         };
+    },
+    mounted() {
+        // Verifica login persistente
+        this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     },
 };
 </script>

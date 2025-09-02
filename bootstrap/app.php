@@ -15,9 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
-        $middleware->api(append: [
-            \App\Http\Middleware\AuthTokenMiddleware::class,
-        ]);
+        // NÃO adicionar AuthTokenMiddleware globalmente ao grupo 'api'.
+        // Proteja apenas rotas específicas via Route::middleware('auth.token')->group(...)
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
