@@ -1,5 +1,5 @@
 <template>
-    <section class="post-list pt-2">
+    <section class="post-list pt-2 px-2 sm:px-0">
         <ul>
             <PostItem
                 v-for="(post, index) in posts"

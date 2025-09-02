@@ -1,7 +1,7 @@
 <template>
     <button
         :class="[
-            'nav-button px-4 py-2 rounded text-sm transition',
+            'nav-button px-3 sm:px-4 py-2 rounded text-sm transition w-full sm:w-auto',
             primary
                 ? 'bg-[#daa520] text-white hover:bg-[#d3ad71]'
                 : 'bg-[#00244a] border border-[#daa520] text-[#daa520] hover:bg-[#daa520] hover:text-white',
