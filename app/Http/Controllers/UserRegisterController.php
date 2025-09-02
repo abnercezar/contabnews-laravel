@@ -17,9 +17,12 @@ class UserRegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+        // Gera token fake igual ao login
+        $token = bin2hex(random_bytes(16));
         return response()->json([
             'message' => 'Usuário cadastrado com sucesso!',
             'user' => $user,
+            'token' => $token,
         ], Response::HTTP_CREATED);
     }
 }

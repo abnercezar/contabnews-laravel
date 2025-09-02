@@ -57,8 +57,15 @@ export default {
             this.showHamburgerMenu = !this.showHamburgerMenu;
         },
         selectHamburgerItem(item) {
-            // Aqui você pode adicionar navegação ou ação específica
-            this.showHamburgerMenu = false;
+            if (item.label === "Deslogar") {
+                localStorage.removeItem("isLoggedIn");
+                this.isLoggedIn = false;
+                this.showHamburgerMenu = false;
+                window.location.href = "/";
+            } else {
+                // Outras ações de menu
+                this.showHamburgerMenu = false;
+            }
         },
         updateWindowWidth() {
             this.windowWidth = window.innerWidth;
