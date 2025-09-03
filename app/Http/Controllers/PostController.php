@@ -17,6 +17,10 @@ class PostController extends Controller
         $post = Post::create($request->validated());
         return response()->json($post, 201);
     }
+    public function create()
+    {
+        return \Inertia\Inertia::render('CreateContent');
+    }
 
     public function show(Post $post)
     {

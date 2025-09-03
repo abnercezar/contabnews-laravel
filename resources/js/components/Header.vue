@@ -62,6 +62,12 @@ export default {
                 this.isLoggedIn = false;
                 this.showHamburgerMenu = false;
                 window.location.href = "/";
+            } else if (item.label === "Novo conteúdo") {
+                this.showHamburgerMenu = false;
+                window.location.href = "/content/create";
+            } else if (item.label === "Meus conteúdos") {
+                this.showHamburgerMenu = false;
+                window.location.href = "/publications";
             } else {
                 // Outras ações de menu
                 this.showHamburgerMenu = false;
@@ -82,6 +88,7 @@ export default {
     },
 };
 </script>
+
 <template>
     <header class="bg-[#00244a] text-white py-4 shadow-md min-h-[80px]">
         <div

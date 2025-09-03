@@ -1,0 +1,149 @@
+<script>
+import Header from "../components/Header.vue";
+import { Viewer, Editor } from "@bytemd/vue-next";
+export default {
+    name: "CreateContent",
+    components: { Header, Viewer, Editor },
+    data() {
+        return {
+            form: {
+                title: "",
+                body: "",
+                source_url: "",
+                isSponsoredContent: false,
+            },
+        };
+    },
+};
+</script>
+
+<template>
+    <div class="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div class="flex-1 flex flex-col justify-center items-center mt-8">
+            <div class="w-full max-w-xl bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h1 class="text-2xl font-bold mb-6 text-center text-[#00244a]">
+                    Publicar novo conteúdo
+                </h1>
+                <form @submit.prevent="submit" class="space-y-6">
+                    <div>
+                        <label
+                            for="title"
+                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                        >
+                            Título <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            v-model="form.title"
+                            id="title"
+                            type="text"
+                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50"
+                            placeholder="e.g. Como os jogos de Atari eram desenvolvidos"
+                            maxlength="120"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            for="body"
+                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                        >
+                            Corpo da publicação
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <textarea
+                            v-model="form.body"
+                            id="body"
+                            rows="8"
+                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50 resize-none"
+                            placeholder="Digite o conteúdo..."
+                            maxlength="20000"
+                            required
+                        ></textarea>
+                        <div class="text-xs text-gray-500 mt-1 text-right">
+                            {{ form.body.length }}/20000
+                        </div>
+                        <div class="mt-6">
+                            <label
+                                class="block text-sm font-semibold mb-2 text-[#00244a]"
+                                >Preview</label
+                            >
+                            <div class="border rounded bg-gray-50 p-4">
+                                <Viewer :value="form.body" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            for="source_url"
+                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                            >Fonte</label
+                        >
+                        <input
+                            v-model="form.source_url"
+                            id="source_url"
+                            type="text"
+                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50"
+                            placeholder="https://origem.site/noticia"
+                        />
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input
+                            v-model="form.isSponsoredContent"
+                            id="isSponsoredContent"
+                            type="checkbox"
+                            class="form-checkbox h-4 w-4 text-[#00244a]"
+                        />
+                        <label
+                            for="isSponsoredContent"
+                            class="text-sm text-[#00244a]"
+                        >
+                            Criar como publicação patrocinada.
+                            <a
+                                href="/faq#publicacao-patrocinada"
+                                class="underline"
+                                >Saiba mais.</a
+                            >
+                        </label>
+                    </div>
+                    <div class="text-xs text-gray-500 mb-2">
+                        Serão consumidos 100 TabCash para criar a publicação
+                        patrocinada.
+                    </div>
+                    <div class="text-xs text-gray-500 mb-2">
+                        Os campos marcados com um asterisco (*) são
+                        obrigatórios.
+                    </div>
+                    <div class="flex gap-2">
+                        <button
+                            type="submit"
+                            class="flex-1 bg-[#00244a] text-white py-2 rounded font-bold hover:bg-[#001a33] transition"
+                        >
+                            Publicar
+                        </button>
+                        <button
+                            type="button"
+                            @click="cancel"
+                            class="flex-1 bg-gray-200 text-gray-700 py-2 rounded font-bold hover:bg-gray-300 transition"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <footer
+                class="w-full max-w-xl mx-auto text-center text-xs text-gray-500 py-4 border-t"
+            >
+                © 2025 TabNews &nbsp;|&nbsp;
+                <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">Museu</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">RSS</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">Sobre</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">Status</a> &nbsp;|&nbsp;
+                <a href="#" class="underline">Termos de Uso</a>
+            </footer>
+        </div>
+    </div>
+</template>
