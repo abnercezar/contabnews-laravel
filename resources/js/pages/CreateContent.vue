@@ -1,9 +1,9 @@
 <script>
 import Header from "../components/Header.vue";
-import { Viewer, Editor } from "@bytemd/vue-next";
+import MarkdownEditor from "../components/MarkdownEditor.vue";
 export default {
     name: "CreateContent",
-    components: { Header, Viewer, Editor },
+    components: { Header, MarkdownEditor },
     data() {
         return {
             form: {
@@ -51,27 +51,14 @@ export default {
                             Corpo da publicação
                             <span class="text-red-500">*</span>
                         </label>
-                        <textarea
+                        <MarkdownEditor
                             v-model="form.body"
-                            id="body"
-                            rows="8"
-                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50 resize-none"
                             placeholder="Digite o conteúdo..."
-                            maxlength="20000"
-                            required
-                        ></textarea>
+                        />
                         <div class="text-xs text-gray-500 mt-1 text-right">
                             {{ form.body.length }}/20000
                         </div>
-                        <div class="mt-6">
-                            <label
-                                class="block text-sm font-semibold mb-2 text-[#00244a]"
-                                >Preview</label
-                            >
-                            <div class="border rounded bg-gray-50 p-4">
-                                <Viewer :value="form.body" />
-                            </div>
-                        </div>
+                        <!-- Preview removido junto com bytemd -->
                     </div>
                     <div>
                         <label

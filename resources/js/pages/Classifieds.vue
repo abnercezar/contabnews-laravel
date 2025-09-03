@@ -1,7 +1,9 @@
 <script>
+import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Header from "../components/Header.vue";
 import { Viewer } from "@bytemd/vue-next";
 export default {
+    components: { MarkdownEditor },
     name: "Classifieds",
     components: { Header, Viewer },
     methods: {
@@ -13,6 +15,11 @@ export default {
 </script>
 
 <template>
+    <!-- Exemplo de uso do MarkdownEditor -->
+    <MarkdownEditor
+        v-model="conteudoClassificado"
+        placeholder="Digite o conteúdo do classificado..."
+    />
     <div class="min-h-screen bg-gray-50 flex flex-col">
         <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
