@@ -6,6 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        if ($this->has('author')) {
+            $this->merge(['author' => null]);
+        }
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,7 +29,6 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
             'content' => 'required|string',
         ];
     }

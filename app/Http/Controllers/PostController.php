@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use Inertia\Inertia;
 
@@ -31,14 +32,22 @@ class PostController extends Controller
         return response()->json($post);
     }
 
-    public function update(StorePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        $post->update($request->validated());
+        if ($post->author !== $request->user()->name) {
+            return response()->json(['error' => 'Acesso negado'], 403);
+        }
+        $validated = app(UpdatePostRequest::class)->validated();
+        $post->update($validated);
         return response()->json($post);
     }
 
     public function destroy(Post $post)
     {
+        $user = auth()->user();
+        if (!$user || $post->author !== $user->name) {
+            return response()->json(['error' => 'Acesso negado'], 403);
+        }
         $post->delete();
         return response()->json(null, 204);
     }
