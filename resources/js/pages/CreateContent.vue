@@ -1,9 +1,10 @@
 <script>
 import Header from "../components/Header.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
+import Modal from "../components/Modal.vue";
 export default {
     name: "CreateContent",
-    components: { Header, MarkdownEditor },
+    components: { Header, MarkdownEditor, Modal },
     data() {
         return {
             form: {
@@ -12,13 +13,123 @@ export default {
                 source_url: "",
                 isSponsoredContent: false,
             },
+            showModal: false,
+            modalMessage: "",
+            modalTitle: "",
         };
+    },
+    methods: {
+        async submit() {
+            try {
+                const payload = {
+                    title: this.form.title,
+                    content: this.form.body,
+                    source_url: this.form.source_url,
+                    isSponsoredContent: !!this.form.isSponsoredContent,
+                };
+                const response = await fetch("/api/posts", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = null;
+                }
+                if (!response.ok) {
+                    let msg = "Erro ao salvar publicação.";
+                    if (response.status === 422 && data && data.errors) {
+                        // Tradução dos campos conhecidos
+                        const fieldMap = {
+                            title: "Título",
+                            body: "Corpo da publicação",
+                            author: "Autor",
+                            content: "Conteúdo",
+                        };
+                        msg = Object.entries(data.errors)
+                            .map(([field, arr]) =>
+                                arr
+                                    .map((err) =>
+                                        err
+                                            .replace(
+                                                /The ([a-zA-Z_]+) field is required\./,
+                                                (m, f) =>
+                                                    `O campo "${
+                                                        fieldMap[f] || f
+                                                    }" é obrigatório.`
+                                            )
+                                            .replace(
+                                                /The ([a-zA-Z_]+) field/,
+                                                (m, f) =>
+                                                    `O campo "${
+                                                        fieldMap[f] || f
+                                                    }"`
+                                            )
+                                    )
+                                    .join(" ")
+                            )
+                            .join("\n");
+                    } else if (data && data.message) {
+                        msg = data.message
+                            .replace(
+                                /The ([a-zA-Z_]+) field is required\./,
+                                (m, f) =>
+                                    `O campo "${
+                                        fieldMap[f] || f
+                                    }" é obrigatório.`
+                            )
+                            .replace(
+                                /The ([a-zA-Z_]+) field/,
+                                (m, f) => `O campo "${fieldMap[f] || f}"`
+                            );
+                    }
+                    this.modalTitle = "Erro";
+                    this.modalMessage = msg;
+                    this.showModal = true;
+                    return;
+                }
+                this.modalTitle = "Sucesso";
+                this.modalMessage = "Sua publicação foi criada com sucesso!";
+                this.showModal = true;
+                // Redirecionar ou limpar formulário
+                this.form.title = "";
+                this.form.body = "";
+                this.form.source_url = "";
+                this.form.isSponsoredContent = false;
+            } catch (error) {
+                this.modalTitle = "Erro";
+                this.modalMessage =
+                    "Ocorreu um erro inesperado ao salvar a publicação.";
+                this.showModal = true;
+            }
+        },
+        cancel() {
+            // Lógica para cancelar
+            this.form.title = "";
+            this.form.body = "";
+            this.form.source_url = "";
+            this.form.isSponsoredContent = false;
+        },
+        closeModal() {
+            this.showModal = false;
+        },
     },
 };
 </script>
 
 <template>
     <div class="min-h-screen bg-gray-50 flex flex-col">
+        <Modal
+            :visible="showModal"
+            :message="modalMessage"
+            :title="modalTitle"
+            @close="closeModal"
+        />
         <Header />
         <div class="flex-1 flex flex-col justify-center items-center mt-8">
             <div class="w-full max-w-xl bg-white rounded-lg shadow-lg p-8 mb-8">

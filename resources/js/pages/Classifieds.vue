@@ -1,7 +1,6 @@
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Header from "../components/Header.vue";
-import { Viewer } from "@bytemd/vue-next";
 export default {
     components: { MarkdownEditor },
     name: "Classifieds",

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
+use Inertia\Inertia;
 
 class PostController extends Controller
 {
@@ -14,12 +15,15 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $post = Post::create($request->validated());
+        $data = $request->validated();
+        $user = $request->user();
+        $data['author'] = $user ? $user->name : 'Anônimo';
+        $post = Post::create($data);
         return response()->json($post, 201);
     }
     public function create()
     {
-        return \Inertia\Inertia::render('CreateContent');
+        return Inertia::render('CreateContent');
     }
 
     public function show(Post $post)

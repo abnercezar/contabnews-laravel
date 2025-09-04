@@ -1,14 +1,16 @@
 <?php
 
-use App\Models\Post;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('cria um post via API', function () {
+    $user = User::factory()->create(['name' => 'Tester']);
+    $this->actingAs($user, 'api');
+
     $payload = [
         'title' => 'Teste de Post',
-        'author' => 'Tester',
         'content' => 'Conteúdo de teste',
     ];
 

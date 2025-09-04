@@ -2,33 +2,37 @@
 
 namespace App\Services;
 
+use App\Actions\CreatePostAction;
+use App\Actions\DeletePostAction;
+use App\Actions\FindPostAction;
+use App\Actions\GetAllPostsAction;
+use App\Actions\UpdatePostAction;
 use App\Models\Post;
 
 class PostService
 {
     public function create(array $data): Post
     {
-        return Post::create($data);
+        return app(CreatePostAction::class)->execute($data);
     }
 
     public function getAll()
     {
-        return Post::all();
+        return app(GetAllPostsAction::class)->execute();
     }
 
     public function find($id)
     {
-        return Post::findOrFail($id);
+        return app(FindPostAction::class)->execute($id);
     }
 
     public function update(Post $post, array $data)
     {
-        $post->update($data);
-        return $post;
+        return app(UpdatePostAction::class)->execute($post, $data);
     }
 
     public function delete(Post $post)
     {
-        return $post->delete();
+        return app(DeletePostAction::class)->execute($post);
     }
 }

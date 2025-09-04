@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'token', // use 'sanctum' se estiver usando Laravel Sanctum
+            'provider' => 'users',
+        ],
     ],
 
     /*
