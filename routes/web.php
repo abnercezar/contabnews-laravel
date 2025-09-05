@@ -14,8 +14,7 @@ Route::get('/register', function () {
 
 Route::get('/login', function () {
     return Inertia::render('Login');
-});
-
+})->name('login');
 
 Route::get('/profile', function () {
     return Inertia::render('Profile');
@@ -32,9 +31,7 @@ Route::get('/classifieds', function () {
     return Inertia::render('Classifieds');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/content/create', [PostController::class, 'create'])->name('content.create');
-    Route::post('/posts', [PostController::class, 'store']);
-    Route::put('/posts/{post}', [PostController::class, 'update']);
-    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
-});
+Route::get('/content/create', [PostController::class, 'create'])->name('content.create');
+Route::post('/posts', [PostController::class, 'store']);
+Route::put('/posts/{post}', [PostController::class, 'update']);
+Route::delete('/posts/{post}', [PostController::class, 'destroy']);
