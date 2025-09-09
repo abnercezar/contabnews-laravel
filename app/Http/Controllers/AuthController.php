@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -22,10 +23,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Credenciais inválidas'], 401);
         }
 
-        // Para início, retorna apenas o usuário (ideal: JWT ou Sanctum)
+        // Gera o token real do Sanctum
+        $token = $user->createToken('default')->plainTextToken;
         return response()->json([
             'user' => $user,
-            'token' => bin2hex(random_bytes(16)), // token fake para exemplo
+            'token' => $token,
         ]);
     }
 }
