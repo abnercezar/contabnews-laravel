@@ -138,6 +138,9 @@ async function login() {
             success.value = data.message || "Login realizado com sucesso!";
             // Salva login no localStorage
             localStorage.setItem("isLoggedIn", "true");
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+            }
             // Redireciona para a home
             window.location.href = "/";
         } else {

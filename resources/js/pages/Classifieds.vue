@@ -1,10 +1,20 @@
+data() { return { classifiedContent: "", }; },
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Header from "../components/Header.vue";
+import Viewer from "viewerjs";
+import "viewerjs/dist/viewer.css";
+
 export default {
-    components: { MarkdownEditor },
     name: "Classifieds",
-    components: { Header, Viewer },
+    components: { Header, MarkdownEditor },
+    mounted() {
+        // Exemplo de inicialização do Viewer em um elemento com ref="gallery"
+        // const gallery = this.$refs.gallery;
+        // if (gallery) {
+        //   this.viewer = new Viewer(gallery);
+        // }
+    },
     methods: {
         goToCreateContent() {
             this.$inertia.visit("/content/create");
@@ -14,17 +24,21 @@ export default {
 </script>
 
 <template>
-    <!-- Exemplo de uso do MarkdownEditor -->
-    <MarkdownEditor
-        v-model="conteudoClassificado"
-        placeholder="Digite o conteúdo do classificado..."
-    />
     <div class="min-h-screen bg-gray-50 flex flex-col">
         <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
             <div
                 class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8 mb-8"
             >
+                <!-- Editor e contador dentro do card -->
+                <MarkdownEditor
+                    v-model="classifiedContent"
+                    placeholder="Digite seu conteúdo classificado..."
+                    :maxlength="20000"
+                />
+                <div class="text-xs text-gray-500 mt-1 text-right">
+                    {{ (classifiedContent || "").length }}/20000
+                </div>
                 <nav class="flex justify-center mb-6">
                     <a
                         href="/profile"
@@ -107,7 +121,7 @@ export default {
                             ></path>
                         </svg>
                     </a>
-                    © 2025 ContabNews
+                    <span>© 2025 ContabNews</span>
                 </div>
                 <div class="flex flex-wrap justify-center gap-2">
                     <a href="/contato" class="underline">Contato</a>

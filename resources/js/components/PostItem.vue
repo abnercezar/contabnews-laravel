@@ -18,6 +18,10 @@
             <span class="post-author">· {{ post.author }}</span>
             <span class="post-time italic">· {{ post.time }}</span>
         </div>
+        <div v-if="isAuthor" class="post-actions mt-2 flex gap-2">
+            <button @click="$emit('edit', post)">Editar</button>
+            <button @click="deletePost">Excluir</button>
+        </div>
     </li>
 </template>
 <script>
@@ -26,6 +30,32 @@ export default {
     props: {
         post: Object,
         index: Number,
+        currentUser: Object,
+    },
+    computed: {
+        isAuthor() {
+            return (
+                this.currentUser && this.currentUser.name === this.post.author
+            );
+        },
+    },
+    methods: {
+        async deletePost() {
+            if (confirm("Tem certeza que deseja excluir este post?")) {
+                try {
+                    await fetch(`/api/posts/${this.post.id}`, {
+                        method: "DELETE",
+                        headers: {
+                            Accept: "application/json",
+                            // Adicione o token de autenticação se necessário
+                        },
+                    });
+                    this.$emit("deleted", this.post);
+                } catch (error) {
+                    alert("Erro ao excluir o post");
+                }
+            }
+        },
     },
 };
 </script>

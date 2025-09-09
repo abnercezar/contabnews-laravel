@@ -27,11 +27,13 @@ export default {
                     source_url: this.form.source_url,
                     isSponsoredContent: !!this.form.isSponsoredContent,
                 };
+                const token = localStorage.getItem("token");
                 const response = await fetch("/api/posts", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
+                        Authorization: token ? `Bearer ${token}` : undefined,
                     },
                     body: JSON.stringify(payload),
                 });
