@@ -175,7 +175,7 @@
             </form>
         </div>
         <footer class="mt-8 text-center text-xs text-gray-500">
-            © 2025 TabNews &nbsp;|&nbsp;
+            © 2025 ConTabNews &nbsp;|&nbsp;
             <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
             <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
             <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;

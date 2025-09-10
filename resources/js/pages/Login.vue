@@ -89,7 +89,7 @@
                 </div>
             </form>
             <div class="mt-4 text-sm text-center">
-                Novo no TabNews?
+                Novo no ConTabNews?
                 <a href="/register" class="underline text-[#00244a]"
                     >Crie sua conta aqui.</a
                 >
@@ -100,7 +100,7 @@
             </div>
         </div>
         <footer class="mt-8 text-center text-xs text-gray-500">
-            © 2025 TabNews &nbsp;|&nbsp;
+            © 2025 ConTabNews &nbsp;|&nbsp;
             <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
             <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
             <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
@@ -113,6 +113,7 @@
 
 <script setup>
 import { reactive, ref } from "vue";
+import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 
 const form = reactive({
     email: "",

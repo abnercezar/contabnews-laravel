@@ -1,8 +1,9 @@
 <script>
 import Header from "../components/Header.vue";
+import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 export default {
     name: "Profile",
-    components: { Header },
+    components: { Header, ConTabNewsIcon },
 };
 </script>
 
@@ -42,17 +43,9 @@ export default {
                     <h2
                         class="text-2xl font-bold text-[#00244a] mb-6 flex items-center gap-2"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="28"
-                            height="28"
-                            fill="#00244a"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"
-                            />
-                        </svg>
+                        <ConTabNewsIcon
+                            style="width: 28px; height: 28px; fill: #00244a"
+                        />
                         Perfil
                     </h2>
                     <div class="flex flex-col items-center gap-4 mb-4 w-full">
@@ -148,19 +141,18 @@ export default {
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="26"
-                            height="26"
-                            fill="currentColor"
+                            fill="#daa520"
                             viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            class="min-w-[28px] min-h-[28px] sm:min-w-[42px] sm:min-h-[42px]"
                         >
                             <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M18.9999 4C20.6568 4 21.9999 5.34315 21.9999 7V17C21.9999 18.6569 20.6568 20 18.9999 20H4.99994C3.34308 20 1.99994 18.6569 1.99994 17V7C1.99994 5.34315 3.34308 4 4.99994 4H18.9999ZM19.9999 9.62479H13C12.4478 9.62479 11.8442 9.20507 11.652 8.68732L10.6542 6H4.99994C4.44765 6 3.99994 6.44772 3.99994 7V17C3.99994 17.5523 4.44765 18 4.99994 18H18.9999C19.5522 18 19.9999 17.5523 19.9999 17V9.62479Z"
-                            />
+                                d="M19 3H5a2 2 0 0 0-2 2v14a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2zm0 2v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5h14zm-2 3H7v2h10V8zm0 4H7v2h10v-2zm-4 4H7v2h6v-2z"
+                            ></path>
                         </svg>
                     </a>
-                    © 2025 TabNews
+                    © 2025 ConTabNews
                 </div>
                 <div class="flex flex-wrap justify-center gap-2">
                     <a href="/contato" class="underline">Contato</a>

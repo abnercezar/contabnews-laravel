@@ -4,7 +4,7 @@
     >
         <div class="container mx-auto px-2 sm:px-0">
             <p class="text-xs sm:text-base">
-                &copy; 2025 Contabnews - Todos os direitos reservados
+                &copy; 2025 ConTabNews - Todos os direitos reservados
             </p>
         </div>
     </footer>

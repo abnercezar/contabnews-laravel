@@ -1,8 +1,9 @@
 <script>
 import Header from "../components/Header.vue";
+import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 export default {
     name: "Publications",
-    components: { Header },
+    components: { Header, ConTabNewsIcon },
     data() {
         return {
             isLoggedIn: false,
@@ -95,21 +96,25 @@ export default {
                 class="w-full max-w-2xl mx-auto text-center text-xs text-gray-500 py-4 border-t flex flex-col items-center"
             >
                 <div class="flex items-center gap-2 mb-2">
-                    <a href="/" aria-label="Página inicial" class="inline-block"
-                        ><svg
+                    <a
+                        href="/"
+                        aria-label="Página inicial"
+                        class="inline-block"
+                    >
+                        <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="26"
-                            height="26"
-                            fill="currentColor"
+                            fill="#daa520"
                             viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            class="min-w-[28px] min-h-[28px] sm:min-w-[42px] sm:min-h-[42px]"
                         >
                             <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M18.9999 4C20.6568 4 21.9999 5.34315 21.9999 7V17C21.9999 18.6569 20.6568 20 18.9999 20H4.99994C3.34308 20 1.99994 18.6569 1.99994 17V7C1.99994 5.34315 3.34308 4 4.99994 4H18.9999ZM19.9999 9.62479H13C12.4478 9.62479 11.8442 9.20507 11.652 8.68732L10.6542 6H4.99994C4.44765 6 3.99994 6.44772 3.99994 7V17C3.99994 17.5523 4.44765 18 4.99994 18H18.9999C19.5522 18 19.9999 17.5523 19.9999 17V9.62479Z"
-                            /></svg
-                    ></a>
-                    © 2025 TabNews
+                                d="M19 3H5a2 2 0 0 0-2 2v14a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2zm0 2v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5h14zm-2 3H7v2h10V8zm0 4H7v2h10v-2zm-4 4H7v2h6v-2z"
+                            ></path>
+                        </svg>
+                    </a>
+                    © 2025 ConTabNews
                 </div>
                 <div class="flex flex-wrap justify-center gap-2">
                     <a href="/contato" class="underline">Contato</a>

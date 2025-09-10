@@ -5,6 +5,7 @@ import SearchIcon from "./SearchIcon.vue";
 import HamburgerIcon from "./HamburgerIcon.vue";
 import TabCoinIcon from "./TabCoinIcon.vue";
 import DropdownMenu from "./DropdownMenu.vue";
+import ConTabNewsIcon from "./ConTabNewsIcon.vue"; // Importando o novo ícone ConTabNews
 // Ícones SVG simples para cada item
 const icons = {
     ACA: `<svg class='inline w-5 h-5 mr-2' fill='none' stroke='#daa520' viewBox='0 0 24 24'><path d='M3 12l9-9 9 9v8a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/></svg>`, // Casa
@@ -24,11 +25,12 @@ export default {
         HamburgerIcon,
         TabCoinIcon,
         DropdownMenu,
+        ConTabNewsIcon, // Adicionando o novo ícone ao componente
     },
     data() {
         return {
             isLoggedIn: false,
-            activeTab: "ContabNews",
+            activeTab: "ConTabNews",
             showSubHeader: false,
             subTabs: ["Publicações", "Comentários", "Classificados", "Todos"],
             activeSubTab: "Publicações",

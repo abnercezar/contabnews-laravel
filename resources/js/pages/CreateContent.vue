@@ -2,6 +2,7 @@
 import Header from "../components/Header.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Modal from "../components/Modal.vue";
+import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 export default {
     name: "CreateContent",
     components: { Header, MarkdownEditor, Modal },
@@ -234,7 +235,7 @@ export default {
             <footer
                 class="w-full max-w-xl mx-auto text-center text-xs text-gray-500 py-4 border-t"
             >
-                © 2025 TabNews &nbsp;|&nbsp;
+                © 2025 ConTabNews &nbsp;|&nbsp;
                 <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
                 <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
                 <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
