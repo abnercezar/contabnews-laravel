@@ -19,9 +19,8 @@ Route::get('/login', function () {
 Route::get('/profile', function () {
     return Inertia::render('Profile');
 });
-Route::get('/publications', function () {
-    return Inertia::render('Publications');
-});
+
+Route::get('/publications', [PostController::class, 'publicationsPage']);
 
 Route::get('/comments', function () {
     return Inertia::render('Comments');
@@ -32,6 +31,7 @@ Route::get('/classifieds', function () {
 });
 
 Route::get('/content/create', [PostController::class, 'create'])->name('content.create');
+Route::get('/content/{post}', [PostController::class, 'showPage'])->name('content.show');
 Route::post('/posts', [PostController::class, 'store']);
 Route::put('/posts/{post}', [PostController::class, 'update']);
 Route::delete('/posts/{post}', [PostController::class, 'destroy']);
