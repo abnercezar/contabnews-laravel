@@ -8,7 +8,9 @@
             >
         </template>
         <p class="post-title text-base sm:text-lg font-bold text-gray-800 mb-2">
-            {{ index + 1 }}. {{ post.title }}
+            <a :href="`/content/${post.id}`" class="hover:underline">
+                {{ index + 1 }}. {{ post.title }}
+            </a>
         </p>
         <div
             class="post-info text-xs sm:text-sm text-gray-500 flex gap-2 sm:gap-4 flex-wrap"

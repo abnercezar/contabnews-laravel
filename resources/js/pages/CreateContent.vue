@@ -99,7 +99,25 @@ export default {
                 this.modalTitle = "Sucesso";
                 this.modalMessage = "Sua publicação foi criada com sucesso!";
                 this.showModal = true;
-                // Redirecionar ou limpar formulário
+                // Redirecionar para a lista de publicações e passar o post criado
+                // Aguarda um pequeno timeout para que o usuário veja a mensagem
+                setTimeout(() => {
+                    try {
+                        if (this.$inertia && typeof this.$inertia.get === "function") {
+                            // Envia o post criado como query param 'newPost' (JSON string)
+                            this.$inertia.get(
+                                "/publications",
+                                { newPost: JSON.stringify(data) },
+                                { preserveState: false }
+                            );
+                        } else {
+                            // Fallback: navegar normalmente (sem passar o objeto)
+                            window.location.href = "/publications";
+                        }
+                    } catch (e) {
+                        window.location.href = "/publications";
+                    }
+                }, 300);
                 this.form.title = "";
                 this.form.body = "";
                 this.form.source_url = "";

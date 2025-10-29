@@ -1,25 +1,3 @@
-<template>
-    <section class="post-list pt-2 px-2 sm:px-0">
-        <h2>Posts</h2>
-        <PostForm
-            v-if="showForm"
-            :post="editPost"
-            @saved="onSaved"
-            @cancel="cancelEdit"
-        />
-        <button v-if="!showForm" @click="showForm = true">Novo Post</button>
-        <ul>
-            <li v-for="post in posts" :key="post.id">
-                <PostItem
-                    :post="post"
-                    :currentUser="currentUser"
-                    @edit="editPostHandler"
-                    @deleted="onDeleted"
-                />
-            </li>
-        </ul>
-    </section>
-</template>
 <script>
 import PostForm from "./PostForm.vue";
 import PostItem from "./PostItem.vue";
@@ -67,3 +45,25 @@ export default {
     },
 };
 </script>
+
+<template>
+    <section class="post-list pt-2 px-2 sm:px-0">
+        <PostForm
+            v-if="showForm"
+            :post="editPost"
+            @saved="onSaved"
+            @cancel="cancelEdit"
+        />
+        <ul>
+            <PostItem
+                v-for="(post, index) in posts"
+                :key="post.id"
+                :post="post"
+                :index="index"
+                :currentUser="currentUser"
+                @edit="editPostHandler"
+                @deleted="onDeleted"
+            />
+        </ul>
+    </section>
+</template>

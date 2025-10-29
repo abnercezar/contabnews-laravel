@@ -54,6 +54,29 @@ export default {
         },
         selectSubTab(subTab) {
             this.activeSubTab = subTab;
+            // Mapeamento de sub-tabs para rotas
+            const routeMap = {
+                Publicações: "/publications",
+                Comentários: "/comments",
+                Classificados: "/classifieds",
+                Todos: "/",
+            };
+            const target = routeMap[subTab];
+            if (target) {
+                // Preferir Inertia para navegação SPA quando disponível
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit(target);
+                    } else {
+                        window.location.href = target;
+                    }
+                } catch (e) {
+                    window.location.href = target;
+                }
+            }
         },
         toggleHamburgerMenu() {
             this.showHamburgerMenu = !this.showHamburgerMenu;
@@ -113,7 +136,7 @@ export default {
                         />
                     </svg>
                 </span>
-                <span>Contab News</span>
+                <span>Tabnews de CRM</span>
             </h1>
             <!-- Abas principais -->
             <nav
