@@ -8,6 +8,9 @@ use App\Models\Post;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Actions\CreatePostAction;
+use App\Actions\UpdatePostAction;
+use App\Actions\DeletePostAction;
 
 class PostController extends Controller
 {
@@ -32,8 +35,11 @@ class PostController extends Controller
     {
         $data = $request->validated();
         $user = $request->user();
-        $data['author'] = $user ? $user->name : 'Anônimo';
-        $post = Post::create($data);
+
+        // Use CreatePostAction to keep controller thin and delegate business logic.
+        $action = app(CreatePostAction::class);
+        $post = $action->execute($data, $user);
+
         return response()->json($post, 201);
     }
     public function create()
@@ -75,11 +81,16 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, Post $post)
     {
-        if ($post->author !== $request->user()->name) {
+        $user = $request->user();
+        if ($post->author !== ($user?->name ?? null)) {
             return response()->json(['error' => 'Acesso negado'], 403);
         }
-        $validated = app(UpdatePostRequest::class)->validated();
-        $post->update($validated);
+
+        $validated = $request->validated();
+
+        $action = app(UpdatePostAction::class);
+        $post = $action->execute($post, $validated);
+
         return response()->json($post);
     }
 
@@ -89,7 +100,10 @@ class PostController extends Controller
         if (!$user || $post->author !== $user->name) {
             return response()->json(['error' => 'Acesso negado'], 403);
         }
-        $post->delete();
+
+        $action = app(DeletePostAction::class);
+        $action->execute($post);
+
         return response()->json(null, 204);
     }
 }

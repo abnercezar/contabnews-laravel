@@ -2,19 +2,24 @@
 
 namespace App\Actions;
 
-use App\Services\PostService;
+use App\Models\Post;
+use App\Models\User;
 
 class CreatePostAction
 {
-    protected $service;
-
-    public function __construct(PostService $service)
+    /**
+     * Execute the creation of a Post.
+     *
+     * @param array $data Validated input data
+     * @param \App\Models\User|null $author Optional author (will set author name)
+     * @return \App\Models\Post
+     */
+    public function execute(array $data, ?User $author = null): Post
     {
-        $this->service = $service;
-    }
+        if ($author) {
+            $data['author'] = $author->name;
+        }
 
-    public function execute(array $data)
-    {
-        return $this->service->create($data);
+        return Post::create($data);
     }
 }
