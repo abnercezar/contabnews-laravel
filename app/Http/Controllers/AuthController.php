@@ -30,4 +30,14 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        if ($user && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
+
+        return response()->json(['message' => 'Logout realizado com sucesso.']);
+    }
 }

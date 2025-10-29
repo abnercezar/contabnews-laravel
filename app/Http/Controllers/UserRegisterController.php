@@ -17,8 +17,9 @@ class UserRegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-        // Gera token fake igual ao login
-        $token = bin2hex(random_bytes(16));
+        // Gera token real do Sanctum para uso na API
+        $token = $user->createToken('default')->plainTextToken;
+
         return response()->json([
             'message' => 'Usuário cadastrado com sucesso!',
             'user' => $user,
