@@ -21,6 +21,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+ToDo.md
+Fluxograma.png
+stack.md
 
 **/caddy
 frankenphp
