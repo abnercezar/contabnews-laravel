@@ -7,7 +7,7 @@ uses(RefreshDatabase::class);
 
 test('cria um post via API', function () {
     $user = User::factory()->create(['name' => 'Tester']);
-    $this->actingAs($user, 'api');
+    $this->actingAs($user, 'sanctum');
 
     $payload = [
         'title' => 'Teste de Post',
