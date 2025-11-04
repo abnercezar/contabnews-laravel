@@ -3,9 +3,10 @@ import Header from "../components/Header.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Modal from "../components/Modal.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+import Footer from "../components/Footer.vue";
 export default {
     name: "CreateContent",
-    components: { Header, MarkdownEditor, Modal },
+    components: { Header, MarkdownEditor, Modal, Footer },
     data() {
         return {
             form: {
@@ -103,7 +104,10 @@ export default {
                 // Aguarda um pequeno timeout para que o usuário veja a mensagem
                 setTimeout(() => {
                     try {
-                        if (this.$inertia && typeof this.$inertia.get === "function") {
+                        if (
+                            this.$inertia &&
+                            typeof this.$inertia.get === "function"
+                        ) {
                             // Envia o post criado como query param 'newPost' (JSON string)
                             this.$inertia.get(
                                 "/publications",
@@ -144,7 +148,7 @@ export default {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="min-h-screen bg-white flex flex-col">
         <Modal
             :visible="showModal"
             :message="modalMessage"
@@ -153,15 +157,15 @@ export default {
         />
         <Header />
         <div class="flex-1 flex flex-col justify-center items-center mt-8">
-            <div class="w-full max-w-xl bg-white rounded-lg shadow-lg p-8 mb-8">
-                <h1 class="text-2xl font-bold mb-6 text-center text-[#00244a]">
+            <div class="w-full max-w-3xl p-8 mb-8 mx-4 sm:mx-auto">
+                <h1 class="text-2xl font-bold mb-6 text-center text-gray-700">
                     Publicar novo conteúdo
                 </h1>
                 <form @submit.prevent="submit" class="space-y-6">
                     <div>
                         <label
                             for="title"
-                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                            class="block text-sm font-semibold mb-1 text-gray-700"
                         >
                             Título <span class="text-red-500">*</span>
                         </label>
@@ -169,7 +173,7 @@ export default {
                             v-model="form.title"
                             id="title"
                             type="text"
-                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50"
+                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50"
                             placeholder="e.g. Como os jogos de Atari eram desenvolvidos"
                             maxlength="120"
                             required
@@ -178,7 +182,7 @@ export default {
                     <div>
                         <label
                             for="body"
-                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                            class="block text-sm font-semibold mb-1 text-gray-700"
                         >
                             Corpo da publicação
                             <span class="text-red-500">*</span>
@@ -195,14 +199,14 @@ export default {
                     <div>
                         <label
                             for="source_url"
-                            class="block text-sm font-semibold mb-1 text-[#00244a]"
+                            class="block text-sm font-semibold mb-1 text-gray-700"
                             >Fonte</label
                         >
                         <input
                             v-model="form.source_url"
                             id="source_url"
                             type="text"
-                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50"
+                            class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50"
                             placeholder="https://origem.site/noticia"
                         />
                     </div>
@@ -211,11 +215,11 @@ export default {
                             v-model="form.isSponsoredContent"
                             id="isSponsoredContent"
                             type="checkbox"
-                            class="form-checkbox h-4 w-4 text-[#00244a]"
+                            class="form-checkbox h-4 w-4 text-gray-700"
                         />
                         <label
                             for="isSponsoredContent"
-                            class="text-sm text-[#00244a]"
+                            class="text-sm text-gray-700"
                         >
                             Criar como publicação patrocinada.
                             <a
@@ -236,7 +240,7 @@ export default {
                     <div class="flex gap-2">
                         <button
                             type="submit"
-                            class="flex-1 bg-[#00244a] text-white py-2 rounded font-bold hover:bg-[#001a33] transition"
+                            class="flex-1 bg-[#daa520] text-white py-2 rounded font-bold hover:bg-[#d3ad71] transition"
                         >
                             Publicar
                         </button>
@@ -250,19 +254,7 @@ export default {
                     </div>
                 </form>
             </div>
-            <footer
-                class="w-full max-w-xl mx-auto text-center text-xs text-gray-500 py-4 border-t"
-            >
-                © 2025 ConTabNews &nbsp;|&nbsp;
-                <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">Museu</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">RSS</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">Sobre</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">Status</a> &nbsp;|&nbsp;
-                <a href="#" class="underline">Termos de Uso</a>
-            </footer>
         </div>
+        <Footer />
     </div>
 </template>

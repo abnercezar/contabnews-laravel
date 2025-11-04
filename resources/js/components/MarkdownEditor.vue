@@ -20,7 +20,7 @@
         <textarea
             :value="modelValue"
             @input="$emit('update:modelValue', $event.target.value)"
-            class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50 resize-none"
+            class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50 resize-none"
             :placeholder="placeholder"
         ></textarea>
     </div>

@@ -84,17 +84,66 @@ export default {
                     time: "1 dia atrás",
                 },
             ],
+            activeTab: "Recentes",
+            subTabs: ["Publicações", "Comentários", "Classificados", "Todos"],
+            activeSubTab: "Publicações",
         };
+    },
+    mounted() {
+        try {
+            const saved = localStorage.getItem("activeSubTab");
+            if (saved) this.activeSubTab = saved;
+        } catch (e) {
+            // ignore
+        }
+    },
+    methods: {
+        selectTab(tab) {
+            this.activeTab = tab;
+        },
+        selectSubTab(subTab) {
+            this.activeSubTab = subTab;
+            const routeMap = {
+                Publicações: "/publications",
+                Comentários: "/comments",
+                Classificados: "/classifieds",
+                Todos: "/",
+            };
+            const target = routeMap[subTab];
+            if (target) {
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit(target);
+                    } else {
+                        window.location.href = target;
+                    }
+                } catch (e) {
+                    window.location.href = target;
+                }
+            }
+        },
+        onHeaderSubtabChanged(sub) {
+            this.activeSubTab = sub;
+        },
     },
 };
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col bg-gray-100">
-        <Header />
+    <div class="min-h-screen bg-white flex flex-col">
+        <Header
+            :active-tab="activeTab"
+            @tab-changed="selectTab"
+            @subtab-changed="onHeaderSubtabChanged"
+        />
         <main class="main-content flex-1">
             <div class="container mx-auto px-4">
-                <PostList :posts="posts" />
+                <!-- Sub-abas agora são renderizadas pelo Header (fixas abaixo do header) -->
+
+                <PostList :posts="posts" :filter="activeSubTab" />
             </div>
         </main>
         <Footer />

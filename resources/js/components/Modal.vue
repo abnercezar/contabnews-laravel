@@ -4,13 +4,13 @@
         class="fixed inset-0 z-50 flex items-center justify-center"
     >
         <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h2 v-if="title" class="text-lg font-bold mb-2 text-[#00244a]">
+            <h2 v-if="title" class="text-lg font-bold mb-2 text-gray-700">
                 {{ title }}
             </h2>
             <div class="mb-4 text-gray-700">{{ message }}</div>
             <button
                 @click="close"
-                class="w-full py-2 bg-[#00244a] text-white rounded font-bold hover:bg-[#001a33] transition"
+                class="w-full py-2 bg-[#daa520] text-white rounded font-bold hover:bg-[#d3ad71] transition"
             >
                 OK
             </button>

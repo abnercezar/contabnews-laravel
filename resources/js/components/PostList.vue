@@ -5,22 +5,35 @@ import PostItem from "./PostItem.vue";
 export default {
     name: "PostList",
     components: { PostForm, PostItem },
+    props: {
+        posts: {
+            type: Array,
+            default: () => [],
+        },
+        filter: {
+            type: String,
+            default: null,
+        },
+    },
     data() {
         return {
-            posts: [],
+            fetchedPosts: [],
             showForm: false,
             editPost: null,
             currentUser: null, // Preencha com o usuário logado
         };
     },
     created() {
-        this.fetchPosts();
+        // fetch only if parent didn't pass posts
+        if (!this.posts || this.posts.length === 0) {
+            this.fetchPosts();
+        }
         this.fetchCurrentUser();
     },
     methods: {
         async fetchPosts() {
             const response = await fetch("/api/posts");
-            this.posts = await response.json();
+            this.fetchedPosts = await response.json();
         },
         async fetchCurrentUser() {
             // Implemente a busca do usuário logado (exemplo: via /api/user)
@@ -43,6 +56,27 @@ export default {
             this.fetchPosts();
         },
     },
+    computed: {
+        displayedPosts() {
+            // source: prefer posts prop passed from parent, else fetchedPosts
+            const source =
+                this.posts && this.posts.length
+                    ? this.posts
+                    : this.fetchedPosts;
+            if (!this.filter || this.filter === "Todos") return source;
+
+            // If items have a 'type' field, use it. Otherwise, attempt naive heuristics.
+            const map = {
+                Publicações: (p) => !p.type || p.type === "post",
+                Comentários: (p) => p.type === "comment" || !!p.comments,
+                Classificados: (p) =>
+                    p.type === "classified" || p.category === "classified",
+            };
+            const fn = map[this.filter];
+            if (!fn) return source;
+            return source.filter(fn);
+        },
+    },
 };
 </script>
 
@@ -56,8 +90,8 @@ export default {
         />
         <ul>
             <PostItem
-                v-for="(post, index) in posts"
-                :key="post.id"
+                v-for="(post, index) in displayedPosts"
+                :key="post.id || index"
                 :post="post"
                 :index="index"
                 :currentUser="currentUser"

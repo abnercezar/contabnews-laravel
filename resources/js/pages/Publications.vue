@@ -1,9 +1,11 @@
 <script>
 import Header from "../components/Header.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+import Footer from "../components/Footer.vue";
+
 export default {
     name: "Publications",
-    components: { Header, ConTabNewsIcon },
+    components: { Header, ConTabNewsIcon, Footer },
     data() {
         return {
             isLoggedIn: false,
@@ -26,7 +28,7 @@ export default {
                 }
                 const data = await res.json();
                 this.posts = Array.isArray(data) ? data : [];
-                // Se houver um novo post passado como prop via Inertia (vindo do CreateContent), adicioná-lo ao topo
+                // if newPost passed via Inertia, add to top
                 try {
                     const newPost =
                         this.$page &&
@@ -42,13 +44,9 @@ export default {
                                     newPost.title &&
                                     p.title === newPost.title)
                         );
-                        if (!exists) {
-                            this.posts.unshift(newPost);
-                        }
+                        if (!exists) this.posts.unshift(newPost);
                     }
-                } catch (e) {
-                    // ignore
-                }
+                } catch (e) {}
             } catch (e) {
                 this.posts = [];
             } finally {
@@ -56,185 +54,88 @@ export default {
             }
         },
         goToCreateContent() {
-            this.$inertia.visit("/content/create");
+            if (this.$inertia && typeof this.$inertia.visit === "function") {
+                this.$inertia.visit("/content/create");
+            } else {
+                window.location.href = "/content/create";
+            }
         },
     },
 };
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="min-h-screen bg-white flex flex-col">
         <Header />
-        <div class="flex-1 flex flex-col items-center mt-8">
-            <div
-                class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8 mb-8"
-            >
-                <h1 class="text-2xl font-bold mb-2 text-[#00244a] text-center">
-                    ACA
-                </h1>
-                <nav class="flex justify-center mb-6">
-                    <template v-if="isLoggedIn">
-                        <a
-                            href="/profile"
-                            class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
-                            >Perfil</a
-                        >
-                    </template>
-                    <a
-                        href="/publications"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] bg-gray-100 rounded-t font-bold"
-                        >Publicações</a
-                    >
-                    <a
-                        href="/comments"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
-                        >Comentários</a
-                    >
-                    <a
-                        href="/classifieds"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
-                        >Classificados</a
-                    >
-                </nav>
-                <div class="flex flex-col items-center py-8">
+
+        <main class="flex-1">
+            <div class="w-full max-w-4xl mx-auto px-4 py-8">
+                <div class="flex flex-col">
                     <template v-if="loading">
                         <div class="text-gray-500">
                             Carregando publicações...
                         </div>
                     </template>
+
                     <template v-else>
                         <template v-if="posts.length === 0">
-                            <svg
-                                class="mb-4 text-gray-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="40"
-                                height="40"
-                                fill="currentColor"
-                                viewBox="0 0 448 512"
-                            >
-                                <path
-                                    d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"
-                                />
-                            </svg>
-                            <h2
-                                class="text-lg font-semibold text-gray-700 mb-2"
-                            >
+                            <div class="text-center py-8 text-gray-500">
                                 Nenhuma publicação encontrada
-                            </h2>
-                            <span class="text-gray-500 mb-4"
-                                >Você ainda não fez nenhuma publicação.</span
-                            >
-                            <button
-                                @click="goToCreateContent"
-                                class="bg-[#00244a] text-white px-4 py-2 rounded font-bold hover:bg-[#001a33] transition flex items-center gap-2"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    fill="currentColor"
-                                    viewBox="0 0 16 16"
-                                >
-                                    <path
-                                        d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"
-                                    />
-                                </svg>
-                                Publicar conteúdo
-                            </button>
-                        </template>
-                        <template v-else>
-                            <div class="w-full">
-                                <ul class="space-y-4">
-                                    <li
-                                        v-for="post in posts"
-                                        :key="post.id"
-                                        class="border-b py-4"
-                                    >
-                                        <a
-                                            :href="`/content/${post.id}`"
-                                            class="block"
-                                        >
-                                            <h3
-                                                class="text-lg font-semibold text-[#00244a]"
-                                            >
-                                                {{ post.title }}
-                                            </h3>
-                                            <p class="text-sm text-gray-600">
-                                                Por
-                                                {{ post.author || "Anônimo" }} •
-                                                <span
-                                                    class="text-xs text-gray-400"
-                                                    >{{
-                                                        post.created_at
-                                                            ? new Date(
-                                                                  post.created_at
-                                                              ).toLocaleString()
-                                                            : ""
-                                                    }}</span
-                                                >
-                                            </p>
-                                            <p class="mt-2 text-gray-700">
-                                                {{
-                                                    (
-                                                        post.content ||
-                                                        post.body ||
-                                                        ""
-                                                    ).slice(0, 240)
-                                                }}
-                                                <span
-                                                    v-if="
-                                                        (
-                                                            post.content ||
-                                                            post.body ||
-                                                            ''
-                                                        ).length > 240
-                                                    "
-                                                    >...</span
-                                                >
-                                            </p>
-                                        </a>
-                                    </li>
-                                </ul>
                             </div>
+                            <div class="text-center">
+                                <button
+                                    @click="goToCreateContent"
+                                    class="bg-[#daa520] text-white px-4 py-2 rounded font-bold hover:bg-[#d3ad71] transition"
+                                >
+                                    Publicar conteúdo
+                                </button>
+                            </div>
+                        </template>
+
+                        <template v-else>
+                            <!-- Featured / first post in green -->
+                            <div v-if="posts[0]" class="mb-6">
+                                <a
+                                    :href="`/content/${posts[0].id}`"
+                                    class="text-green-600 font-semibold text-lg hover:underline"
+                                    >{{ posts[0].title }}</a
+                                >
+                                <div class="text-sm text-gray-500 mt-1">
+                                    Contribuindo com
+                                    {{ posts[0].author || "Anônimo" }}
+                                </div>
+                            </div>
+
+                            <!-- Numbered list -->
+                            <ol class="list-decimal pl-6 space-y-6">
+                                <li
+                                    v-for="(post, idx) in posts.slice(1)"
+                                    :key="post.id"
+                                >
+                                    <a
+                                        :href="`/content/${post.id}`"
+                                        class="text-lg font-semibold text-gray-900 hover:underline"
+                                        >{{ post.title }}</a
+                                    >
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        1 tabcoin · 0 comentário ·
+                                        {{ post.author || "Anônimo" }} ·
+                                        {{
+                                            post.created_at
+                                                ? new Date(
+                                                      post.created_at
+                                                  ).toLocaleString()
+                                                : ""
+                                        }}
+                                    </div>
+                                </li>
+                            </ol>
                         </template>
                     </template>
                 </div>
             </div>
-            <footer
-                class="w-full max-w-2xl mx-auto text-center text-xs text-gray-500 py-4 border-t flex flex-col items-center"
-            >
-                <div class="flex items-center gap-2 mb-2">
-                    <a
-                        href="/"
-                        aria-label="Página inicial"
-                        class="inline-block"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="#daa520"
-                            viewBox="0 0 24 24"
-                            width="28"
-                            height="28"
-                            class="min-w-[28px] min-h-[28px] sm:min-w-[42px] sm:min-h-[42px]"
-                        >
-                            <path
-                                d="M19 3H5a2 2 0 0 0-2 2v14a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2zm0 2v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5h14zm-2 3H7v2h10V8zm0 4H7v2h10v-2zm-4 4H7v2h6v-2z"
-                            ></path>
-                        </svg>
-                    </a>
-                    © 2025 ConTabNews
-                </div>
-                <div class="flex flex-wrap justify-center gap-2">
-                    <a href="/contato" class="underline">Contato</a>
-                    <a href="/faq" class="underline">FAQ</a>
-                    <a href="" class="underline">GitHub</a>
-                    <a href="/museu" class="underline">Museu</a>
-                    <a href="/recentes/rss" class="underline">RSS</a>
-                    <a href="" class="underline">Sobre</a>
-                    <a href="/status" class="underline">Status</a>
-                    <a href="/termos-de-uso" class="underline">Termos de Uso</a>
-                </div>
-            </footer>
-        </div>
+        </main>
+
+        <Footer />
     </div>
 </template>

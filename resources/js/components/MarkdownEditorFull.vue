@@ -20,11 +20,11 @@
         </div>
         <textarea
             v-model="input"
-            class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#00244a] bg-gray-50 resize-none mb-4"
+            class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50 resize-none mb-4"
             :placeholder="placeholder"
         ></textarea>
         <div class="mt-4">
-            <label class="block text-sm font-semibold mb-2 text-[#00244a]"
+            <label class="block text-sm font-semibold mb-2 text-gray-700"
                 >Preview</label
             >
             <div
@@ -133,7 +133,7 @@ button:hover {
     overflow-x: auto;
 }
 .markdown-body blockquote {
-    border-left: 4px solid #00244a;
+    border-left: 4px solid #374151;
     padding-left: 1em;
     color: #555;
     margin: 1em 0;

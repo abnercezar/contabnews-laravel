@@ -12,7 +12,7 @@
                     <input
                         v-model="form.email"
                         type="email"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a]"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700"
                         placeholder="Digite seu email"
                         required
                     />
@@ -22,7 +22,7 @@
                     <input
                         v-model="form.password"
                         :type="showPassword ? 'text' : 'password'"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] pr-10"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700 pr-10"
                         placeholder="Digite sua senha"
                         required
                     />
@@ -77,7 +77,7 @@
                 <button
                     type="submit"
                     :disabled="loading"
-                    class="w-full bg-[#00244a] text-white py-2 rounded font-bold hover:bg-[#001a33] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full bg-[#daa520] text-white py-2 rounded font-bold hover:bg-[#d3ad71] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ loading ? "Entrando..." : "Entrar" }}
                 </button>
@@ -90,30 +90,23 @@
             </form>
             <div class="mt-4 text-sm text-center">
                 Novo no ConTabNews?
-                <a href="/register" class="underline text-[#00244a]"
+                <a href="/register" class="underline text-gray-700"
                     >Crie sua conta aqui.</a
                 >
             </div>
             <div class="mt-2 text-sm text-center">
                 Esqueceu sua senha?
-                <a href="#" class="underline text-[#00244a]">Clique aqui.</a>
+                <a href="#" class="underline text-gray-700">Clique aqui.</a>
             </div>
         </div>
-        <footer class="mt-8 text-center text-xs text-gray-500">
-            © 2025 ConTabNews &nbsp;|&nbsp;
-            <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">Museu</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">RSS</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">Sobre</a>
-        </footer>
+        <Footer />
     </div>
 </template>
 
 <script setup>
 import { reactive, ref } from "vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+import Footer from "../components/Footer.vue";
 
 const form = reactive({
     email: "",

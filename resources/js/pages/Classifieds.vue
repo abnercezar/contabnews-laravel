@@ -2,12 +2,13 @@ data() { return { classifiedContent: "", }; },
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Header from "../components/Header.vue";
+import Footer from "../components/Footer.vue";
 import Viewer from "viewerjs";
 import "viewerjs/dist/viewer.css";
 
 export default {
     name: "Classifieds",
-    components: { Header, MarkdownEditor },
+    components: { Header, MarkdownEditor, Footer },
     mounted() {
         // Exemplo de inicialização do Viewer em um elemento com ref="gallery"
         // const gallery = this.$refs.gallery;
@@ -24,12 +25,10 @@ export default {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="min-h-screen bg-white flex flex-col">
         <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
-            <div
-                class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8 mb-8"
-            >
+            <div class="w-full max-w-4xl p-8 mb-8 mx-4 sm:mx-auto">
                 <!-- Editor e contador dentro do card -->
                 <MarkdownEditor
                     v-model="classifiedContent"
@@ -42,22 +41,22 @@ export default {
                 <nav class="flex justify-center mb-6">
                     <a
                         href="/profile"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
                         >Perfil</a
                     >
                     <a
                         href="/publications"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
                         >Publicações</a
                     >
                     <a
                         href="/comments"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] hover:bg-gray-100 rounded-t transition"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
                         >Comentários</a
                     >
                     <a
                         href="/classifieds"
-                        class="px-4 py-2 text-sm font-medium text-[#00244a] bg-gray-100 rounded-t font-bold"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-t font-bold"
                         >Classificados</a
                     >
                 </nav>
@@ -82,7 +81,7 @@ export default {
                     >
                     <button
                         @click="goToCreateContent"
-                        class="bg-[#00244a] text-white px-4 py-2 rounded font-bold hover:bg-[#001a33] transition flex items-center gap-2"
+                        class="bg-[#daa520] text-white px-4 py-2 rounded font-bold hover:bg-[#d3ad71] transition flex items-center gap-2"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -99,41 +98,7 @@ export default {
                     </button>
                 </div>
             </div>
-            <footer
-                class="w-full max-w-2xl mx-auto text-center text-xs text-gray-500 py-4 border-t flex flex-col items-center"
-            >
-                <div class="flex items-center gap-2 mb-2">
-                    <a
-                        href="/"
-                        aria-label="Página inicial"
-                        class="inline-block"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="#daa520"
-                            viewBox="0 0 24 24"
-                            width="28"
-                            height="28"
-                            class="min-w-[28px] min-h-[28px] sm:min-w-[42px] sm:min-h-[42px]"
-                        >
-                            <path
-                                d="M19 3H5a2 2 0 0 0-2 2v14a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2zm0 2v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5h14zm-2 3H7v2h10V8zm0 4H7v2h10v-2zm-4 4H7v2h6v-2z"
-                            ></path>
-                        </svg>
-                    </a>
-                    <span>© 2025 ContabNews</span>
-                </div>
-                <div class="flex flex-wrap justify-center gap-2">
-                    <a href="/contato" class="underline">Contato</a>
-                    <a href="/faq" class="underline">FAQ</a>
-                    <a href="" class="underline">GitHub</a>
-                    <a href="/museu" class="underline">Museu</a>
-                    <a href="/recentes/rss" class="underline">RSS</a>
-                    <a href="" class="underline">Sobre</a>
-                    <a href="/status" class="underline">Status</a>
-                    <a href="/termos-de-uso" class="underline">Termos de Uso</a>
-                </div>
-            </footer>
         </div>
+        <Footer />
     </div>
 </template>

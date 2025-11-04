@@ -1,12 +1,12 @@
 <script>
-import { CurrencyDollarIcon } from "@heroicons/vue/24/outline";
+import { BanknotesIcon } from "@heroicons/vue/24/outline";
 
 export default {
-    name: "TabCoinIcon",
+    name: "TabCashIcon",
     components: {
-        CurrencyDollarIcon,
+        BanknotesIcon,
     },
-    // allow attributes (class) to be forwarded to the icon
+    // forward attributes (class) to the icon
     inheritAttrs: false,
     setup(props, { attrs }) {
         return { attrs };
@@ -16,5 +16,5 @@ export default {
 
 <template>
     <!-- forward any attrs (including class/text color) to the heroicon -->
-    <CurrencyDollarIcon v-bind="attrs" aria-hidden="true" />
+    <BanknotesIcon v-bind="attrs" aria-hidden="true" />
 </template>

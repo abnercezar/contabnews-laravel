@@ -12,7 +12,7 @@
                     <input
                         v-model="form.name"
                         type="text"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a]"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700"
                         placeholder="Nome público"
                         required
                     />
@@ -24,7 +24,7 @@
                     <input
                         v-model="form.email"
                         type="email"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a]"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700"
                         placeholder="Digite seu email"
                         required
                     />
@@ -34,7 +34,7 @@
                     <input
                         v-model="form.password"
                         :type="showPassword ? 'text' : 'password'"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] pr-10"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700 pr-10"
                         placeholder="Digite sua senha"
                         required
                     />
@@ -93,7 +93,7 @@
                     <input
                         v-model="form.password_confirmation"
                         :type="showPasswordConfirm ? 'text' : 'password'"
-                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00244a] pr-10"
+                        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-700 pr-10"
                         placeholder="Confirme sua senha"
                         required
                     />
@@ -154,7 +154,7 @@
                     />
                     <label for="terms" class="text-sm"
                         >Li e estou de acordo com os
-                        <a href="#" class="underline text-[#00244a]"
+                        <a href="#" class="underline text-gray-700"
                             >Termos de Uso</a
                         >.</label
                     >
@@ -162,7 +162,7 @@
                 <button
                     type="submit"
                     :disabled="!acceptedTerms || loading"
-                    class="w-full bg-[#00244a] text-white py-2 rounded font-bold hover:bg-[#001a33] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full bg-[#daa520] text-white py-2 rounded font-bold hover:bg-[#d3ad71] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ loading ? "Cadastrando..." : "Cadastrar" }}
                 </button>
@@ -174,20 +174,14 @@
                 </div>
             </form>
         </div>
-        <footer class="mt-8 text-center text-xs text-gray-500">
-            © 2025 ConTabNews &nbsp;|&nbsp;
-            <a href="#" class="underline">Contato</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">FAQ</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">GitHub</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">Museu</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">RSS</a> &nbsp;|&nbsp;
-            <a href="#" class="underline">Sobre</a>
-        </footer>
+        <Footer />
     </div>
 </template>
 <script>
+import Footer from "../components/Footer.vue";
 export default {
     name: "Register",
+    components: { Footer },
     data() {
         return {
             form: {

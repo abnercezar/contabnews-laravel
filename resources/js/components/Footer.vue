@@ -1,16 +1,32 @@
+<script>
+import { WindowIcon } from "@heroicons/vue/24/outline";
+
+export default {
+    name: "Footer",
+    components: {
+        WindowIcon,
+    },
+};
+</script>
+
 <template>
     <footer
-        class="bg-[#00244a] text-white text-center py-3 sm:py-4 mt-8 w-full"
+        class="bg-[#3c3c3c] text-white text-center py-3 sm:py-4 mt-8 w-full"
     >
         <div class="container mx-auto px-2 sm:px-0">
-            <p class="text-xs sm:text-base">
-                &copy; 2025 ConTabNews - Todos os direitos reservados
+            <p
+                class="text-xs sm:text-base flex items-center justify-center gap-2"
+            >
+                <span class="inline-flex items-center pointer-events-none">
+                    <WindowIcon
+                        class="w-4 h-4 text-[#daa520] mr-1 pointer-events-none"
+                        aria-hidden="true"
+                    />
+                </span>
+                &copy; 2025
+                <span class="text-[#daa520] font-bold">ConTabNews</span> - Todos
+                os direitos reservados
             </p>
         </div>
     </footer>
 </template>
-<script>
-export default {
-    name: "Footer",
-};
-</script>

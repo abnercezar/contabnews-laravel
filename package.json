@@ -8,6 +8,7 @@
         "commit": "npx cz"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^2.0.9",
         "@tailwindcss/vite": "^4.0.0",
         "@vitejs/plugin-vue": "^5.2.4",
