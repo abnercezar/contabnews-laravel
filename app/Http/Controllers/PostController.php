@@ -71,6 +71,47 @@ class PostController extends Controller
             }
         }
 
+        // Se o usuário estiver autenticado, anexa `my_reaction` a cada post usando Redis (rápido) com fallback para BD.
+        $user = request()->user();
+        if ($user) {
+            foreach ($data as $i => $post) {
+                $postId = $post->id ?? ($post['id'] ?? null);
+                $myReaction = null;
+                if ($postId) {
+                    // Verifica primeiro no Redis pela reação mais recente do usuário
+                    $redisKey = "post:{$postId}:user:{$user->id}";
+                    try {
+                        $r = Redis::get($redisKey);
+                        if ($r !== null) {
+                            $myReaction = $r;
+                        }
+                    } catch (\Exception $e) {
+                        // ignora erro do Redis e faz fallback para o BD
+                    }
+
+                    if ($myReaction === null) {
+                        $myReaction = Reaction::where('post_id', $postId)
+                            ->where('user_id', $user->id)
+                            ->value('type');
+                    }
+                }
+
+                // Normaliza para null ou 'up'|'down'
+                $myReaction = $myReaction ?: null;
+
+                // Garante que retornamos arrays ao cliente
+                $arr = (is_array($post) ? $post : $post->toArray());
+                $arr['my_reaction'] = $myReaction;
+                $data[$i] = $arr;
+            }
+        } else {
+            // converte modelos para arrays para manter formato consistente no cliente
+            foreach ($data as $i => $post) {
+                $data[$i] = (is_array($post) ? $post : $post->toArray());
+                $data[$i]['my_reaction'] = null;
+            }
+        }
+
         return response()->json($data);
     }
 
