@@ -1,24 +1,39 @@
-data() { return { classifiedContent: "", }; },
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
-import Header from "../components/Header.vue";
 import Footer from "../components/Footer.vue";
 import Viewer from "viewerjs";
 import "viewerjs/dist/viewer.css";
 
 export default {
     name: "Classifieds",
-    components: { Header, MarkdownEditor, Footer },
+    components: { MarkdownEditor, Footer },
+    data() {
+        return {
+            classifiedContent: "",
+        };
+    },
     mounted() {
-        // Exemplo de inicialização do Viewer em um elemento com ref="gallery"
-        // const gallery = this.$refs.gallery;
-        // if (gallery) {
-        //   this.viewer = new Viewer(gallery);
-        // }
+    // Exemplo de inicialização do Viewer, se necessário
+    // const gallery = this.$refs.gallery;
+    // se (gallery) this.viewer = new Viewer(gallery);
     },
     methods: {
         goToCreateContent() {
-            this.$inertia.visit("/content/create");
+            const isLogged =
+                typeof window !== "undefined" &&
+                !!localStorage.getItem("token");
+            if (!isLogged) {
+                try {
+                    localStorage.setItem("intendedPath", "/content/create");
+                } catch (e) {}
+                window.location.href = "/login";
+                return;
+            }
+            if (this.$inertia && typeof this.$inertia.visit === "function") {
+                this.$inertia.visit("/content/create");
+            } else {
+                window.location.href = "/content/create";
+            }
         },
     },
 };
@@ -26,7 +41,6 @@ export default {
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
-        <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
             <div class="w-full max-w-4xl p-8 mb-8 mx-4 sm:mx-auto">
                 <!-- Editor e contador dentro do card -->
@@ -99,6 +113,5 @@ export default {
                 </div>
             </div>
         </div>
-        <Footer />
     </div>
 </template>

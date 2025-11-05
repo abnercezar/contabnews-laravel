@@ -99,14 +99,13 @@
                 <a href="#" class="underline text-gray-700">Clique aqui.</a>
             </div>
         </div>
-        <Footer />
     </div>
 </template>
 
 <script setup>
 import { reactive, ref } from "vue";
+import { useAuthStore } from "../stores/auth";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
-import Footer from "../components/Footer.vue";
 
 const form = reactive({
     email: "",
@@ -130,13 +129,31 @@ async function login() {
         const data = await response.json();
         if (response.ok) {
             success.value = data.message || "Login realizado com sucesso!";
-            // Salva login no localStorage
-            localStorage.setItem("isLoggedIn", "true");
+            // Salva token no localStorage (usado pelo cliente para chamar APIs protegidas)
             if (data.token) {
-                localStorage.setItem("token", data.token);
+                // usa a store do Pinia para centralizar token e buscar o usuário
+                try {
+                    const auth = useAuthStore();
+                    await auth.loginWithToken(data.token);
+                } catch (e) {
+                    // fallback para localStorage caso o Pinia não esteja disponível
+                    try {
+                        localStorage.setItem("token", data.token);
+                    } catch (e) {}
+                }
             }
-            // Redireciona para a home
-            window.location.href = "/";
+            // Redireciona para o caminho pretendido (se houver) ou para home
+            try {
+                const intended = localStorage.getItem("intendedPath");
+                if (intended) {
+                    localStorage.removeItem("intendedPath");
+                    window.location.href = intended;
+                } else {
+                    window.location.href = "/";
+                }
+            } catch (e) {
+                window.location.href = "/";
+            }
         } else {
             error.value = data.message || "Erro ao fazer login.";
         }

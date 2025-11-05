@@ -1,12 +1,10 @@
 <script>
-import Header from "../components/Header.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Modal from "../components/Modal.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
-import Footer from "../components/Footer.vue";
 export default {
     name: "CreateContent",
-    components: { Header, MarkdownEditor, Modal, Footer },
+    components: { MarkdownEditor, Modal },
     data() {
         return {
             form: {
@@ -30,6 +28,22 @@ export default {
                     isSponsoredContent: !!this.form.isSponsoredContent,
                 };
                 const token = localStorage.getItem("token");
+                // enforce auth: if visitor, save intended and redirect to login
+                try {
+                    const isLogged = !!localStorage.getItem("token");
+                    if (!isLogged) {
+                        try {
+                            localStorage.setItem(
+                                "intendedPath",
+                                window.location.pathname +
+                                    window.location.search
+                            );
+                        } catch (e) {}
+                        // redirect to login
+                        window.location.href = "/login";
+                    }
+                } catch (e) {}
+
                 const response = await fetch("/api/posts", {
                     method: "POST",
                     headers: {
@@ -155,7 +169,6 @@ export default {
             :title="modalTitle"
             @close="closeModal"
         />
-        <Header />
         <div class="flex-1 flex flex-col justify-center items-center mt-8">
             <div class="w-full max-w-3xl p-8 mb-8 mx-4 sm:mx-auto">
                 <h1 class="text-2xl font-bold mb-6 text-center text-gray-700">
@@ -255,6 +268,5 @@ export default {
                 </form>
             </div>
         </div>
-        <Footer />
     </div>
 </template>

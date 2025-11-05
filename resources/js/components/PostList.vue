@@ -24,7 +24,7 @@ export default {
         };
     },
     created() {
-        // fetch only if parent didn't pass posts
+    // buscar apenas se o componente pai não passou posts
         if (!this.posts || this.posts.length === 0) {
             this.fetchPosts();
         }
@@ -36,7 +36,7 @@ export default {
             this.fetchedPosts = await response.json();
         },
         async fetchCurrentUser() {
-            // Implemente a busca do usuário logado (exemplo: via /api/user)
+        // Implemente a busca do usuário logado (exemplo: via /api/user)
             // this.currentUser = ...
         },
         onSaved(post) {
@@ -58,14 +58,14 @@ export default {
     },
     computed: {
         displayedPosts() {
-            // source: prefer posts prop passed from parent, else fetchedPosts
+            // origem: prefere a prop posts passada pelo pai, caso contrário fetchedPosts
             const source =
                 this.posts && this.posts.length
                     ? this.posts
                     : this.fetchedPosts;
             if (!this.filter || this.filter === "Todos") return source;
 
-            // If items have a 'type' field, use it. Otherwise, attempt naive heuristics.
+            // Se os itens tiverem o campo 'type', use-o. Caso contrário, aplica heurística simples.
             const map = {
                 Publicações: (p) => !p.type || p.type === "post",
                 Comentários: (p) => p.type === "comment" || !!p.comments,

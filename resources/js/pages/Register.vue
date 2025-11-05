@@ -174,14 +174,11 @@
                 </div>
             </form>
         </div>
-        <Footer />
     </div>
 </template>
 <script>
-import Footer from "../components/Footer.vue";
 export default {
     name: "Register",
-    components: { Footer },
     data() {
         return {
             form: {

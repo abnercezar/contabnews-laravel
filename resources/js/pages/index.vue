@@ -1,14 +1,10 @@
 <script>
-import Header from "../components/Header.vue";
 import PostList from "../components/PostList.vue";
-import Footer from "../components/Footer.vue";
 
 export default {
     name: "Index",
     components: {
-        Header,
         PostList,
-        Footer,
     },
     data() {
         return {
@@ -94,7 +90,7 @@ export default {
             const saved = localStorage.getItem("activeSubTab");
             if (saved) this.activeSubTab = saved;
         } catch (e) {
-            // ignore
+            // ignora
         }
     },
     methods: {
@@ -134,11 +130,6 @@ export default {
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
-        <Header
-            :active-tab="activeTab"
-            @tab-changed="selectTab"
-            @subtab-changed="onHeaderSubtabChanged"
-        />
         <main class="main-content flex-1">
             <div class="container mx-auto px-4">
                 <!-- Sub-abas agora são renderizadas pelo Header (fixas abaixo do header) -->
@@ -146,7 +137,6 @@ export default {
                 <PostList :posts="posts" :filter="activeSubTab" />
             </div>
         </main>
-        <Footer />
     </div>
 </template>
 

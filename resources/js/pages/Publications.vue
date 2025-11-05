@@ -1,11 +1,9 @@
 <script>
-import Header from "../components/Header.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
-import Footer from "../components/Footer.vue";
 
 export default {
     name: "Publications",
-    components: { Header, ConTabNewsIcon, Footer },
+    components: { ConTabNewsIcon },
     data() {
         return {
             isLoggedIn: false,
@@ -14,7 +12,7 @@ export default {
         };
     },
     mounted() {
-        this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        this.isLoggedIn = !!localStorage.getItem("token");
         this.fetchPosts();
     },
     methods: {
@@ -28,7 +26,7 @@ export default {
                 }
                 const data = await res.json();
                 this.posts = Array.isArray(data) ? data : [];
-                // if newPost passed via Inertia, add to top
+                // se newPost foi passado via Inertia, adiciona no topo
                 try {
                     const newPost =
                         this.$page &&
@@ -54,10 +52,35 @@ export default {
             }
         },
         goToCreateContent() {
+            const isLogged =
+                typeof window !== "undefined" &&
+                localStorage.getItem("isLoggedIn") === "true";
+            if (!isLogged) {
+                try {
+                    localStorage.setItem("intendedPath", "/content/create");
+                } catch (e) {}
+                window.location.href = "/login";
+                return;
+            }
             if (this.$inertia && typeof this.$inertia.visit === "function") {
                 this.$inertia.visit("/content/create");
             } else {
                 window.location.href = "/content/create";
+            }
+        },
+        openPost(id) {
+            const url = `/content/${id}`;
+            try {
+                if (
+                    this.$inertia &&
+                    typeof this.$inertia.visit === "function"
+                ) {
+                    this.$inertia.visit(url);
+                } else {
+                    window.location.href = url;
+                }
+            } catch (e) {
+                window.location.href = url;
             }
         },
     },
@@ -66,8 +89,6 @@ export default {
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
-        <Header />
-
         <main class="flex-1">
             <div class="w-full max-w-4xl mx-auto px-4 py-8">
                 <div class="flex flex-col">
@@ -96,7 +117,8 @@ export default {
                             <!-- Featured / first post in green -->
                             <div v-if="posts[0]" class="mb-6">
                                 <a
-                                    :href="`/content/${posts[0].id}`"
+                                    href="#"
+                                    @click.prevent="openPost(posts[0].id)"
                                     class="text-green-600 font-semibold text-lg hover:underline"
                                     >{{ posts[0].title }}</a
                                 >
@@ -113,7 +135,8 @@ export default {
                                     :key="post.id"
                                 >
                                     <a
-                                        :href="`/content/${post.id}`"
+                                        href="#"
+                                        @click.prevent="openPost(post.id)"
                                         class="text-lg font-semibold text-gray-900 hover:underline"
                                         >{{ post.title }}</a
                                     >
@@ -135,7 +158,5 @@ export default {
                 </div>
             </div>
         </main>
-
-        <Footer />
     </div>
 </template>

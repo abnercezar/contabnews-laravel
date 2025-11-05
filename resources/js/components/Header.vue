@@ -12,9 +12,11 @@ import MainTabs from "./MainTabs.vue";
 import SubTabs from "./SubTabs.vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import ConTabNewsIcon from "./ConTabNewsIcon.vue"; // Importando o novo ícone ConTabNews
-// use official Heroicons Window icon
+// usa o ícone Window oficial do Heroicons
 import { WindowIcon } from "@heroicons/vue/24/outline";
 import icons from "./icons.js";
+import { useAuthStore } from "../stores/auth";
+import { onMounted } from "vue";
 
 export default {
     name: "Header",
@@ -43,6 +45,7 @@ export default {
     emits: ["tab-changed"],
     data() {
         return {
+            // usa a store do Pinia para o estado de auth; uma flag local permanece para compatibilidade, mas é atualizada pela store
             isLoggedIn: false,
             subTabs: ["Publicações", "Comentários", "Classificados", "Todos"],
             activeSubTab:
@@ -77,7 +80,17 @@ export default {
         },
     },
     mounted() {
-        this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    // inicializa a store de auth e busca o usuário caso o token esteja presente
+        try {
+            this.auth = useAuthStore();
+            // busca o usuário se o token existir; define flag local para o template
+            this.auth.fetchUser().then((u) => {
+                this.isLoggedIn = !!u;
+            });
+        } catch (e) {
+            this.isLoggedIn = false;
+        }
+
         window.addEventListener("resize", this.updateWindowWidth);
         this.windowWidth = window.innerWidth;
     },
