@@ -6,7 +6,7 @@ export default {
     components: {
         BanknotesIcon,
     },
-    // forward attributes (class) to the icon
+    // repassa atributos (class) para o ícone
     inheritAttrs: false,
     setup(props, { attrs }) {
         return { attrs };

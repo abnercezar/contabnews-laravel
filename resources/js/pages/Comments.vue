@@ -1,15 +1,12 @@
 <script>
-import Header from "../components/Header.vue";
-import Footer from "../components/Footer.vue";
 export default {
     name: "Comments",
-    components: { Header, Footer },
+    components: {},
 };
 </script>
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
-        <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
             <div class="w-full max-w-4xl p-8 mb-8 mx-4 sm:mx-auto">
                 <nav class="flex justify-center mb-6">
@@ -99,6 +96,5 @@ export default {
                 </div>
             </div>
         </div>
-        <Footer />
     </div>
 </template>

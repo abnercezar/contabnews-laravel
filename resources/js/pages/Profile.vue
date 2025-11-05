@@ -1,16 +1,13 @@
 <script>
-import Header from "../components/Header.vue";
-import Footer from "../components/Footer.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 export default {
     name: "Profile",
-    components: { Header, ConTabNewsIcon, Footer },
+    components: { ConTabNewsIcon },
 };
 </script>
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
-        <Header />
         <div class="flex-1 flex flex-col items-center mt-8">
             <div class="w-full max-w-4xl p-8 mb-8 mx-4 sm:mx-auto">
                 <h1 class="text-2xl font-bold mb-2 text-gray-700 text-center">
@@ -97,6 +94,5 @@ export default {
                 </div>
             </div>
         </div>
-        <Footer />
     </div>
 </template>

@@ -1,5 +1,6 @@
 <script>
 import HamburgerIcon from "./HamburgerIcon.vue";
+import { useAuthStore } from "../stores/auth";
 
 export default {
     name: "AccountMenu",
@@ -13,6 +14,7 @@ export default {
     data() {
         return {
             showHamburgerMenu: false,
+            auth: null,
         };
     },
     methods: {
@@ -20,22 +22,49 @@ export default {
             this.showHamburgerMenu = !this.showHamburgerMenu;
         },
         select(item) {
-            if (item.label === "Deslogar") {
+            // inicializa a store de auth de forma preguiçosa
+            if (!this.auth) {
                 try {
-                    localStorage.removeItem("isLoggedIn");
-                } catch (e) {}
+                    this.auth = useAuthStore();
+                } catch (e) {
+                    this.auth = null;
+                }
+            }
+
+            if (item.label === "Deslogar") {
+                if (this.auth) this.auth.logout();
                 this.showHamburgerMenu = false;
                 window.location.href = "/";
-            } else if (item.label === "Novo conteúdo") {
+                return;
+            }
+
+            if (item.label === "Novo conteúdo") {
                 this.showHamburgerMenu = false;
+                const isLogged = !!(this.auth && this.auth.token);
+                if (!isLogged) {
+                    try {
+                        localStorage.setItem("intendedPath", "/content/create");
+                    } catch (e) {}
+                    window.location.href = "/login";
+                    return;
+                }
                 window.location.href = "/content/create";
-            } else if (item.label === "Meus conteúdos") {
+                return;
+            }
+
+            if (item.label === "Meus conteúdos") {
                 this.showHamburgerMenu = false;
                 window.location.href = "/publications";
-            } else {
-                this.showHamburgerMenu = false;
+                return;
             }
+
+            this.showHamburgerMenu = false;
         },
+    },
+    mounted() {
+        try {
+            this.auth = useAuthStore();
+        } catch (e) {}
     },
 };
 </script>

@@ -12,7 +12,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // ...existing code...
+        // ...código existente...
     }
 
     /**

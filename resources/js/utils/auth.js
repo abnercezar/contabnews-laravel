@@ -1,7 +1,7 @@
 // pequenos helpers de autenticação usados pela interface cliente
 export function isLoggedIn() {
     try {
-    // prefere a presença do token como indicação de sessão autenticada no cliente
+        // prefere a presença do token como indicação de sessão autenticada no cliente
         return !!localStorage.getItem("token");
     } catch (e) {
         return false;

@@ -22,6 +22,9 @@ class Post extends Model
         'time',
     ];
 
+    // adiciona contadores computados de reações ao modelo serializado
+    protected $appends = ['tabcoins', 'tabcashs'];
+
     /**
      * Comentários relacionados a um post
      */
@@ -36,5 +39,27 @@ class Post extends Model
     public function reactions(): HasMany
     {
         return $this->hasMany(Reaction::class);
+    }
+
+    // número de upvotes (usa contador armazenado se disponível)
+    public function getTabcoinsAttribute()
+    {
+        if (array_key_exists('upvotes_count', $this->attributes)) {
+            return (int) $this->attributes['upvotes_count'];
+        }
+        return $this->reactions()->where('type', 'up')->count();
+    }
+
+    // upvotes líquidos (upvotes menos downvotes) — usa contadores armazenados se disponíveis
+    public function getTabcashsAttribute()
+    {
+        if (array_key_exists('upvotes_count', $this->attributes) || array_key_exists('downvotes_count', $this->attributes)) {
+            $up = (int) ($this->attributes['upvotes_count'] ?? 0);
+            $down = (int) ($this->attributes['downvotes_count'] ?? 0);
+            return $up - $down;
+        }
+        $up = $this->reactions()->where('type', 'up')->count();
+        $down = $this->reactions()->where('type', 'down')->count();
+        return $up - $down;
     }
 }

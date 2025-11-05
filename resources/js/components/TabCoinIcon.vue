@@ -6,7 +6,7 @@ export default {
     components: {
         CurrencyDollarIcon,
     },
-    // allow attributes (class) to be forwarded to the icon
+    // permite que atributos (class) sejam repassados para o ícone
     inheritAttrs: false,
     setup(props, { attrs }) {
         return { attrs };

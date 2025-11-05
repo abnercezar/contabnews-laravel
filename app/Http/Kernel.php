@@ -29,7 +29,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\AuthToken;
 
-// ...existing code...
+// ...código existente...
 
 class Kernel extends HttpKernel
 {
