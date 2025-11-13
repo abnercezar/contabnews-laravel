@@ -48,11 +48,7 @@
 
         <!-- Outras abas (ex: Publicações, Comentários, etc) -->
         <div v-else class="space-y-4">
-            <div
-                v-for="(post, index) in posts"
-                :key="index"
-                class="border-b border-gray-200 pb-3"
-            >
+            <div v-for="(post, index) in posts" :key="index" class="pb-3">
                 <div class="mx-auto max-w-2xl text-left">
                     <a
                         :href="itemUrl(post)"
