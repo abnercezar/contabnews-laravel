@@ -8,6 +8,7 @@ export default {
         return {
             classifieds: [
                 {
+                    id: 3001,
                     title: "tutoriais modo texto",
                     username: "RodrigoSchio",
                     comments: 0,
@@ -15,6 +16,7 @@ export default {
                     url: "#",
                 },
                 {
+                    id: 3002,
                     title: "🎤 Aprenda a cantar GRÁTIS com sua música favorita!",
                     username: "justtheryston",
                     comments: 0,
@@ -22,6 +24,7 @@ export default {
                     url: "#",
                 },
                 {
+                    id: 3003,
                     title: "[PITCH] - Todos pelo Beny! - Um site beneficente feito com IA e alguns ajustes manuais.",
                     username: "jonwlf",
                     comments: 0,
@@ -80,6 +83,20 @@ export default {
             ],
         };
     },
+    methods: {
+        openClassified(item) {
+            // Try to open a content page if id exists, otherwise follow url
+            const id = item?.id ?? item?.post_id ?? null;
+            const url = id ? `/content/${id}` : item?.url ?? "#";
+            try {
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
+            } catch (e) {
+                window.location.href = url;
+            }
+        },
+    },
 };
 </script>
 
@@ -91,7 +108,8 @@ export default {
                 <a
                     v-for="(classified, index) in classifieds"
                     :key="index"
-                    :href="classified.url"
+                    href="#"
+                    @click.prevent="openClassified(classified)"
                     class="block border-b border-gray-100 pb-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
                 >
                     <p

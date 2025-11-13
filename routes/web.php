@@ -31,7 +31,8 @@ Route::get('/classifieds', function () {
 });
 
 Route::get('/content/create', [PostController::class, 'create'])->name('content.create');
-Route::get('/content/{post}', [PostController::class, 'showPage'])->name('content.show');
+// Route accepts an id; controller will attempt to load post or render a fallback placeholder
+Route::get('/content/{id}', [PostController::class, 'showPage'])->name('content.show');
 Route::post('/posts', [PostController::class, 'store']);
 Route::put('/posts/{post}', [PostController::class, 'update']);
 Route::delete('/posts/{post}', [PostController::class, 'destroy']);

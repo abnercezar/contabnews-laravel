@@ -10,8 +10,9 @@
                 <div class="mx-auto max-w-2xl text-left">
                     <!-- Título (linkável) -->
                     <a
-                        href="#"
+                        :href="itemUrl(item)"
                         class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                        @click="handleOpen(item, $event)"
                     >
                         {{ item.title }}
                     </a>
@@ -54,8 +55,9 @@
             >
                 <div class="mx-auto max-w-2xl text-left">
                     <a
-                        href="#"
+                        :href="itemUrl(post)"
                         class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                        @click="handleOpen(post, $event)"
                     >
                         {{ post.title }}
                     </a>
@@ -82,10 +84,39 @@ export default {
         posts: Array,
         filter: String,
     },
+    methods: {
+        itemUrl(item) {
+            const id =
+                item?.id ??
+                item?.post_id ??
+                (item?.post && item.post.id) ??
+                null;
+            return id ? `/content/${id}` : "#";
+        },
+
+        handleOpen(item, event) {
+            console.log("[PostList] handleOpen item:", item);
+            const id =
+                item?.id ??
+                item?.post_id ??
+                (item?.post && item.post.id) ??
+                null;
+            if (id) {
+                console.log("[PostList] emitting open with id", id);
+                this.$emit("open", id);
+                if (event && typeof event.preventDefault === "function")
+                    event.preventDefault();
+            } else {
+                console.warn("[PostList] item has no id, cannot open:", item);
+                // no id -> allow native navigation (href may point to external)
+            }
+        },
+    },
     data() {
         return {
             allItems: [
                 {
+                    id: 1001,
                     title: "Pitch: Templates com traduções em três línguas e plano gratuito. En...",
                     contributor: "jaedsonpys",
                     comment:
@@ -96,6 +127,7 @@ export default {
                     time: "13 minutos atrás",
                 },
                 {
+                    id: 1002,
                     title: "Resuming: a plataforma open source de currículos para desenvolvedores",
                     contributor: "dealmeida",
                     comment: "",
@@ -105,6 +137,7 @@ export default {
                     time: "22 minutos atrás",
                 },
                 {
+                    id: 1003,
                     title: "OpenAI lança GPT-5.1",
                     contributor: "NewsletterOficial",
                     comment:

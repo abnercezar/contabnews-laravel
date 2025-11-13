@@ -29,4 +29,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     // reações (upvote/downvote)
     Route::post('posts/{post}/reactions', [\App\Http\Controllers\ReactionController::class, 'toggle']);
+    // comentários
+    Route::post('comments', [\App\Http\Controllers\Api\CommentController::class, 'store']);
 });

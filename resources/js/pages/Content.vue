@@ -1,14 +1,19 @@
 <script>
+import MarkdownEditor from "../components/MarkdownEditor.vue";
+
 export default {
     props: {
         post: Object,
     },
+    components: { MarkdownEditor },
     data() {
         return {
             showReply: false,
             replyBody: "",
             submitting: false,
             replyError: "",
+            // id do comentário ao qual estamos respondendo (opcional)
+            replyingToCommentId: null,
         };
     },
     computed: {
@@ -18,7 +23,7 @@ export default {
         },
     },
     methods: {
-        openReply() {
+        openReply(comment = null) {
             try {
                 const token = localStorage.getItem("token");
                 if (!token) {
@@ -31,10 +36,28 @@ export default {
                     window.location.href = "/login";
                     return;
                 }
+
+                // Se foi passado um comentário, responder a ele
+                if (comment) {
+                    this.replyingToCommentId = comment.id;
+                    const author = comment.user ? comment.user.name : "Anônimo";
+                    const snippet = comment.body
+                        ? comment.body.slice(0, 200)
+                        : "";
+                    this.replyBody = `> ${author}: ${snippet}\n\n`;
+                }
+
                 this.showReply = true;
                 this.$nextTick(() => {
-                    const ta = this.$el.querySelector("textarea");
-                    if (ta) ta.focus();
+                    // tenta focar dentro do MarkdownEditor se disponível
+                    const editor = this.$refs.mdEditor;
+                    if (editor && editor.$el) {
+                        const ta = editor.$el.querySelector("textarea");
+                        if (ta) ta.focus();
+                    } else {
+                        const ta = this.$el.querySelector("textarea");
+                        if (ta) ta.focus();
+                    }
                 });
             } catch (e) {
                 this.showReply = true;
@@ -44,6 +67,7 @@ export default {
             this.showReply = false;
             this.replyBody = "";
             this.replyError = "";
+            this.replyingToCommentId = null;
         },
         async submitReply() {
             this.replyError = "";
@@ -72,6 +96,7 @@ export default {
                     body: JSON.stringify({
                         post_id: this.post.id,
                         body: this.replyBody,
+                        parent_id: this.replyingToCommentId,
                     }),
                 });
                 if (!res.ok) {
@@ -174,7 +199,16 @@ export default {
                     {{ formattedDate }}
                 </div>
 
-                <div class="prose prose-lg mb-6" v-html="post.content"></div>
+                <div
+                    class="mb-6 text-base leading-relaxed text-gray-800"
+                    style="
+                        white-space: pre-wrap;
+                        font-family: ui-sans-serif, system-ui, -apple-system,
+                            'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+                    "
+                >
+                    {{ post.content }}
+                </div>
 
                 <div v-if="post.source_url" class="mb-6 text-sm">
                     <a
@@ -217,12 +251,10 @@ export default {
                             v-else
                             class="mt-0 border border-gray-200 rounded p-4 bg-white"
                         >
-                            <textarea
+                            <MarkdownEditor
+                                ref="mdEditor"
                                 v-model="replyBody"
-                                rows="4"
-                                class="w-full p-2 border rounded"
-                                placeholder="Escreva sua resposta..."
-                            ></textarea>
+                            />
                             <div
                                 class="mt-2 flex items-center justify-end gap-2"
                             >
@@ -258,14 +290,66 @@ export default {
                         <li
                             v-for="comment in post.comments"
                             :key="comment.id"
-                            class="mb-3"
+                            :id="'comment-' + comment.id"
+                            class="mb-3 border-b pb-3"
                         >
-                            <div class="text-sm text-gray-700">
-                                <strong>{{
-                                    comment.user ? comment.user.name : "Anônimo"
-                                }}</strong>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <div class="text-sm text-gray-700">
+                                        <strong>{{
+                                            comment.user
+                                                ? comment.user.name
+                                                : "Anônimo"
+                                        }}</strong>
+                                    </div>
+                                    <div
+                                        class="text-base mt-1 leading-relaxed text-gray-800"
+                                        style="white-space: pre-wrap"
+                                    >
+                                        {{ comment.body }}
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex flex-col items-end gap-2 text-sm"
+                                >
+                                    <button
+                                        @click="openReply(comment)"
+                                        class="text-[#0066cc] hover:underline"
+                                    >
+                                        Responder
+                                    </button>
+                                    <button
+                                        @click.prevent="
+                                            (function () {
+                                                try {
+                                                    const url =
+                                                        window.location.origin +
+                                                        window.location
+                                                            .pathname +
+                                                        '#comment-' +
+                                                        comment.id;
+                                                    if (navigator.share)
+                                                        navigator.share({
+                                                            title: post.title,
+                                                            url,
+                                                        });
+                                                    else {
+                                                        navigator.clipboard.writeText(
+                                                            url
+                                                        );
+                                                        alert(
+                                                            'Link do comentário copiado'
+                                                        );
+                                                    }
+                                                } catch (e) {}
+                                            })()
+                                        "
+                                        class="text-gray-600"
+                                    >
+                                        Compartilhar
+                                    </button>
+                                </div>
                             </div>
-                            <div class="text-base">{{ comment.body }}</div>
                         </li>
                     </ul>
                 </section>

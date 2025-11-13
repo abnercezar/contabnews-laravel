@@ -10,6 +10,7 @@ export default {
         return {
             posts: [
                 {
+                    id: 2001,
                     title: "Como declarar imposto de renda em 2025?",
                     coin: "30 tabcoins",
                     comments: "5 comentários",
@@ -17,6 +18,7 @@ export default {
                     time: "3 horas atrás",
                 },
                 {
+                    id: 2002,
                     title: "Principais mudanças na legislação tributária este ano",
                     coin: "25 tabcoins",
                     comments: "8 comentários",
@@ -24,6 +26,7 @@ export default {
                     time: "1 dia atrás",
                 },
                 {
+                    id: 2003,
                     title: "Dicas para organizar a contabilidade da sua empresa",
                     coin: "18 tabcoins",
                     comments: "3 comentários",
@@ -31,6 +34,7 @@ export default {
                     time: "6 horas atrás",
                 },
                 {
+                    id: 2004,
                     title: "Como funciona o Simples Nacional?",
                     coin: "20 tabcoins",
                     comments: "10 comentários",
@@ -38,6 +42,7 @@ export default {
                     time: "12 horas atrás",
                 },
                 {
+                    id: 2005,
                     title: "Erros comuns ao emitir notas fiscais",
                     coin: "15 tabcoins",
                     comments: "4 comentários",
@@ -124,6 +129,18 @@ export default {
         onHeaderSubtabChanged(sub) {
             this.activeSubTab = sub;
         },
+        openPost(id) {
+            console.log("[Index] openPost", id);
+            if (!id) return;
+            const url = `/content/${id}`;
+            try {
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
+            } catch (e) {
+                window.location.href = url;
+            }
+        },
     },
 };
 </script>
@@ -134,7 +151,11 @@ export default {
             <div class="container mx-auto px-4">
                 <!-- Sub-abas agora são renderizadas pelo Header (fixas abaixo do header) -->
 
-                <PostList :posts="posts" :filter="activeSubTab" />
+                <PostList
+                    :posts="posts"
+                    :filter="activeSubTab"
+                    @open="openPost"
+                />
             </div>
         </main>
     </div>

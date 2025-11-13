@@ -132,8 +132,21 @@ export default {
         },
 
         openPost(id) {
+            console.log("[Publications] openPost id:", id);
+            if (!id) {
+                console.warn("[Publications] openPost called without id");
+                return;
+            }
             const url = `/content/${id}`;
-            this.navigateTo(url);
+            try {
+                this.navigateTo(url);
+            } catch (e) {
+                console.warn(
+                    "[Publications] navigateTo failed, fallback to location.href",
+                    e
+                );
+                window.location.href = url;
+            }
         },
 
         async loadMore() {

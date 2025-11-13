@@ -176,13 +176,28 @@ class PostController extends Controller
     /**
      * Renderiza a página web de post único (Inertia) em /content/{post}
      */
-    public function showPage(Post $post)
+    public function showPage($id)
     {
-        // A relação 'user' não existe em Post; posts armazenam o autor como campo escalar 'author'.
-        // Carrega antecipadamente comentários/reactions usuário, mas não a relação post->user inexistente.
-        $post->load('comments.user', 'reactions.user');
+        // Tenta carregar o post pelo id; se não existir, renderiza uma página de fallback
+        $post = Post::with('comments.user', 'reactions.user')->find($id);
 
-        // anexa my_reaction ao modelo para que o frontend (Inertia) possa ler
+        if (! $post) {
+            // Post não existe no banco — renderiza Inertia com dados de placeholder
+            $placeholder = [
+                'id' => $id,
+                'title' => 'Publicação não encontrada',
+                'content' => '<p>Esta é uma página de exemplo. O post solicitado não existe no banco de dados.</p>',
+                'author' => 'Anônimo',
+                'comments' => [],
+                'my_reaction' => null,
+            ];
+
+            return Inertia::render('Content', [
+                'post' => $placeholder,
+            ]);
+        }
+
+        // post encontrado — anexa relações e my_reaction como antes
         $user = request()->user();
         $myReaction = null;
         if ($user) {
