@@ -1,268 +1,121 @@
-<script>
-import PostForm from "./PostForm.vue";
-import PostItem from "./PostItem.vue";
+<template>
+    <div :class="filter === 'Todos' ? 'text-center' : 'text-left'">
+        <!-- Lista genérica: muda conforme a aba -->
+        <div v-if="filter === 'Todos'" class="space-y-6">
+            <div
+                v-for="(item, index) in allItems"
+                :key="index"
+                class="border-b border-gray-200 pb-4"
+            >
+                <div class="mx-auto max-w-2xl text-left">
+                    <!-- Título (linkável) -->
+                    <a
+                        href="#"
+                        class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                    >
+                        {{ item.title }}
+                    </a>
 
+                    <!-- Contribuidor -->
+                    <p class="text-sm text-gray-500 mt-1">
+                        Contribuindo com
+                        <span class="text-blue-600"
+                            >@{{ item.contributor }}</span
+                        >
+                    </p>
+
+                    <!-- Conteúdo do comentário -->
+                    <p class="text-gray-700 mt-2 italic">
+                        "{{ item.comment }}"
+                    </p>
+
+                    <!-- Rodapé com tabcoins, comentários, autor e tempo (left-aligned dentro da mesma caixa) -->
+                    <div
+                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap"
+                    >
+                        <span>{{ item.tabcoins }} tabcoin</span>
+                        <span>·</span>
+                        <span>{{ item.comments }} comentário</span>
+                        <span>·</span>
+                        <span>{{ item.author }}</span>
+                        <span>·</span>
+                        <span>{{ item.time }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras abas (ex: Publicações, Comentários, etc) -->
+        <div v-else class="space-y-4">
+            <div
+                v-for="(post, index) in posts"
+                :key="index"
+                class="border-b border-gray-200 pb-3"
+            >
+                <div class="mx-auto max-w-2xl text-left">
+                    <a
+                        href="#"
+                        class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                    >
+                        {{ post.title }}
+                    </a>
+                    <div
+                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap"
+                    >
+                        <span>{{ post.coin }}</span>
+                        <span>·</span>
+                        <span>{{ post.comments }}</span>
+                        <span>·</span>
+                        <span>{{ post.author }}</span>
+                        <span>·</span>
+                        <span>{{ post.time }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
 export default {
-    name: "PostList",
-    components: { PostForm, PostItem },
     props: {
-        posts: {
-            type: Array,
-            default: () => [],
-        },
-        start: {
-            type: Number,
-            default: 1,
-        },
-        showActions: {
-            type: Boolean,
-            default: true,
-        },
-        filter: {
-            type: String,
-            default: null,
-        },
-        // Quando true, o componente controla sua própria paginação
-        paginate: {
-            type: Boolean,
-            default: false,
-        },
-        initialPage: {
-            type: Number,
-            default: 1,
-        },
-        perPage: {
-            type: Number,
-            default: 20,
-        },
+        posts: Array,
+        filter: String,
     },
     data() {
         return {
-            fetchedPosts: [],
-            showForm: false,
-            editPost: null,
-            currentUser: null, // Preencha com o usuário logado
-            page: this.initialPage,
-            loading: false,
-            loadingMore: false,
-            hasMore: false,
+            allItems: [
+                {
+                    title: "Pitch: Templates com traduções em três línguas e plano gratuito. En...",
+                    contributor: "jaedsonpys",
+                    comment:
+                        "Com 5 segundos de Google, eu encontrei isso aqui: https://canaltech.com.br/windows/8-programas-para-encontrar-arquivos-duplicados-no-windows/",
+                    tabcoins: 1,
+                    comments: 0,
+                    author: "user1",
+                    time: "13 minutos atrás",
+                },
+                {
+                    title: "Resuming: a plataforma open source de currículos para desenvolvedores",
+                    contributor: "dealmeida",
+                    comment: "",
+                    tabcoins: 1,
+                    comments: 0,
+                    author: "davidsantana06",
+                    time: "22 minutos atrás",
+                },
+                {
+                    title: "OpenAI lança GPT-5.1",
+                    contributor: "NewsletterOficial",
+                    comment:
+                        "a real é q o problema n é a ia nem o mercado é a crença q tem q se adaptar pra continuar no jogo...",
+                    tabcoins: 1,
+                    comments: 0,
+                    author: "dealmeida",
+                    time: "29 minutos atrás",
+                },
+            ],
         };
-    },
-    created() {
-        // se o pai já passou posts, usa-os; caso contrário, busca
-        if (!this.posts || this.posts.length === 0) {
-            this.fetchPosts({ reset: true });
-        } else {
-            // ainda tenta popular currentUser
-            this.fetchCurrentUser();
-        }
-    },
-    methods: {
-        async fetchPosts({ reset = false } = {}) {
-            // se o pai passou posts, não busca (a menos que paginate esteja ativo)
-            if (!this.paginate && this.posts && this.posts.length) {
-                return;
-            }
-
-            if (reset) {
-                this.page = this.initialPage;
-                this.fetchedPosts = [];
-                this.hasMore = false;
-            }
-
-            this.loading = reset || this.loading === false;
-            this.loadingMore = !reset && this.page > this.initialPage;
-
-            try {
-                const res = await fetch(
-                    `/api/posts?page=${this.page}&per_page=${this.perPage}`,
-                    {
-                        headers: { Accept: "application/json" },
-                    }
-                );
-                if (!res.ok) {
-                    // tenta fallback para array vazio
-                    return;
-                }
-                const json = await res.json();
-                const dataArray = Array.isArray(json) ? json : json.data ?? [];
-
-                const items = Array.isArray(dataArray) ? dataArray : [];
-
-                // acrescenta evitando duplicatas
-                items.forEach((p) => {
-                    const exists = this.fetchedPosts.some(
-                        (x) => x.id && p.id && x.id === p.id
-                    );
-                    if (!exists) this.fetchedPosts.push(p);
-                });
-
-                // inferir hasMore a partir de meta ou tamanho retornado
-                if (json.meta) {
-                    if (typeof json.meta.has_more !== "undefined") {
-                        this.hasMore = !!json.meta.has_more;
-                    } else if (
-                        typeof json.meta.current_page !== "undefined" &&
-                        typeof json.meta.last_page !== "undefined"
-                    ) {
-                        this.hasMore =
-                            json.meta.current_page < json.meta.last_page;
-                    } else {
-                        this.hasMore = items.length === this.perPage;
-                    }
-                } else {
-                    this.hasMore = items.length === this.perPage;
-                }
-            } catch (e) {
-                // silent fail
-                // console.error(e);
-            } finally {
-                this.loading = false;
-                this.loadingMore = false;
-            }
-        },
-
-        async loadMore() {
-            if (this.loadingMore || !this.hasMore) return;
-            this.page++;
-            this.loadingMore = true;
-            await this.fetchPosts();
-            this.loadingMore = false;
-        },
-
-        async fetchCurrentUser() {
-            try {
-                const res = await fetch("/api/user", {
-                    headers: { Accept: "application/json" },
-                });
-                if (!res.ok) return;
-                const json = await res.json();
-                // aceita { data: user } ou user puro
-                this.currentUser = json.data ?? json;
-            } catch (e) {
-                // ignore
-            }
-        },
-
-        onSaved(post) {
-            // quando um post é salvo via PostForm: atualiza lista local sem refazer fetch completo
-            try {
-                // se recebe resource wrapper
-                const saved = post.data ?? post;
-                // atualiza item se já existir
-                const idx = this.fetchedPosts.findIndex(
-                    (p) => p.id && saved.id && p.id === saved.id
-                );
-                if (idx !== -1) {
-                    this.$set(this.fetchedPosts, idx, saved);
-                } else {
-                    // adiciona no topo
-                    this.fetchedPosts.unshift(saved);
-                }
-            } catch (e) {
-                // fallback: refetch
-                this.fetchPosts({ reset: true });
-            } finally {
-                this.showForm = false;
-                this.editPost = null;
-            }
-        },
-
-        editPostHandler(post) {
-            this.editPost = post;
-            this.showForm = true;
-        },
-
-        cancelEdit() {
-            this.showForm = false;
-            this.editPost = null;
-        },
-
-        onDeleted(post) {
-            // se passado o post deletado, remove; caso contrário refetch
-            try {
-                const id = post && (post.id ?? null);
-                if (id) {
-                    this.fetchedPosts = this.fetchedPosts.filter(
-                        (p) => !(p.id && p.id === id)
-                    );
-                    return;
-                }
-            } catch (e) {
-                // ignore
-            }
-            // fallback
-            this.fetchPosts({ reset: true });
-        },
-
-        // reemite eventos 'open' vindos de PostItem (útil caso PostItem emita em vez de navegar)
-        onOpenFromItem(id) {
-            this.$emit("open", id);
-        },
-    },
-    computed: {
-        displayedPosts() {
-            // origem: prefere a prop posts passada pelo pai, caso contrário fetchedPosts
-            const source =
-                this.posts && this.posts.length
-                    ? this.posts
-                    : this.fetchedPosts;
-
-            if (!this.filter || this.filter === "Todos") return source;
-
-            // Se os itens tiverem o campo 'type', use-o. Caso contrário, aplica heurística simples.
-            const map = {
-                Publicações: (p) => !p.type || p.type === "post",
-                Comentários: (p) => p.type === "comment" || !!p.comments,
-                Classificados: (p) =>
-                    p.type === "classified" || p.category === "classified",
-            };
-            const fn = map[this.filter];
-            if (!fn) return source;
-            return source.filter(fn);
-        },
     },
 };
 </script>
-
-<template>
-    <section class="post-list pt-2 px-2 sm:px-0">
-        <PostForm
-            v-if="showForm"
-            :post="editPost"
-            @saved="onSaved"
-            @cancel="cancelEdit"
-        />
-        <ul>
-            <PostItem
-                v-for="(post, index) in displayedPosts"
-                :key="post.id || index"
-                :post="post"
-                :index="index + start"
-                :currentUser="currentUser"
-                :show-actions="showActions"
-                @edit="editPostHandler"
-                @deleted="onDeleted"
-                @open="onOpenFromItem"
-            />
-        </ul>
-
-        <!-- botão de ver mais (quando o componente controla paginação) -->
-        <div v-if="paginate" class="text-center mt-6">
-            <button
-                v-if="hasMore && !loadingMore"
-                @click="loadMore"
-                class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm"
-            >
-                Ver mais
-            </button>
-            <div v-else-if="loadingMore" class="text-gray-500 text-sm py-2">
-                Carregando...
-            </div>
-        </div>
-    </section>
-</template>
-
-<style scoped>
-/* ajustes locais se necessário */
-</style>

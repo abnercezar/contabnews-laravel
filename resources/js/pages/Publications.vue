@@ -1,10 +1,11 @@
 <script>
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 import PostList from "../components/PostList.vue";
+import StandardLayout from "../components/StandardLayout.vue";
 
 export default {
     name: "Publications",
-    components: { ConTabNewsIcon, PostList },
+    components: { ConTabNewsIcon, PostList, StandardLayout },
     data() {
         return {
             isLoggedIn: false,
@@ -188,98 +189,87 @@ export default {
 </script>
 
 <template>
-    <div class="min-h-screen bg-white flex flex-col">
-        <main class="flex-1">
-            <div class="w-full max-w-4xl mx-auto px-4 py-8">
-                <div class="flex flex-col">
-                    <!-- Loading -->
-                    <template v-if="loading && posts.length === 0">
-                        <div
-                            class="flex items-center justify-center py-8 text-gray-500"
-                        >
-                            <svg
-                                class="animate-spin h-6 w-6 mr-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                ></circle>
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8v8z"
-                                ></path>
-                            </svg>
-                            Carregando publicações...
-                        </div>
-                    </template>
+    <StandardLayout>
+        <!-- Loading -->
+        <template v-if="loading && posts.length === 0">
+            <!-- <div class="flex items-center justify-center py-8 text-gray-500">
+                <svg
+                    class="animate-spin h-6 w-6 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                    ></path>
+                </svg>
+                Carregando publicações...
+            </div> -->
+        </template>
 
-                    <!-- Empty state -->
-                    <template v-else-if="!loading && posts.length === 0">
-                        <div class="text-center py-8 text-gray-500">
-                            Nenhuma publicação encontrada
-                        </div>
-                        <div class="text-center">
-                            <button
-                                @click="goToCreateContent"
-                                class="bg-[#daa520] text-white px-4 py-2 rounded font-bold hover:bg-[#d3ad71] transition"
-                            >
-                                Publicar conteúdo
-                            </button>
-                        </div>
-                    </template>
+        <!-- Empty state -->
+        <template v-else-if="!loading && posts.length === 0">
+            <div class="text-center py-8 text-gray-500">
+                Nenhuma publicação encontrada
+            </div>
+            <div class="text-center">
+                <button
+                    @click="goToCreateContent"
+                    class="bg-[#daa520] text-white px-4 py-2 rounded font-bold hover:bg-[#d3ad71] transition"
+                >
+                    Publicar conteúdo
+                </button>
+            </div>
+        </template>
 
-                    <!-- Posts list -->
-                    <template v-else>
-                        <!-- Featured / first post (se existir) -->
-                        <div v-if="posts[0]" class="mb-6">
-                            <a
-                                href="#"
-                                @click.prevent="openPost(posts[0].id)"
-                                class="text-green-600 font-extrabold text-2xl hover:underline"
-                            >
-                                {{ posts[0].title }}
-                            </a>
-                            <div class="text-sm text-gray-500 mt-1">
-                                Contribuindo com
-                                {{ posts[0].author || "Anônimo" }}
-                            </div>
-                        </div>
-
-                        <!-- Lista de posts usando componente reutilizável (começa no índice 2) -->
-                        <PostList
-                            :posts="posts.slice(1)"
-                            :start="2"
-                            :show-actions="false"
-                            @open="openPost"
-                        />
-
-                        <!-- Load more -->
-                        <div
-                            class="text-center mt-6"
-                            v-if="hasMore || loadingMore"
-                        >
-                            <button
-                                @click="loadMore"
-                                :disabled="loadingMore"
-                                class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <span v-if="loadingMore">Carregando...</span>
-                                <span v-else>Ver mais</span>
-                            </button>
-                        </div>
-                    </template>
+        <!-- Posts list -->
+        <template v-else>
+            <!-- Featured / first post (se existir) -->
+            <div v-if="posts[0]" class="mb-6">
+                <a
+                    href="#"
+                    @click.prevent="openPost(posts[0].id)"
+                    class="text-green-600 font-extrabold text-2xl hover:underline"
+                >
+                    {{ posts[0].title }}
+                </a>
+                <div class="text-sm text-gray-500 mt-1">
+                    Contribuindo com
+                    {{ posts[0].author || "Anônimo" }}
                 </div>
             </div>
-        </main>
-    </div>
+
+            <!-- Lista de posts usando componente reutilizável (começa no índice 2) -->
+            <PostList
+                :posts="posts.slice(1)"
+                :start="2"
+                :show-actions="false"
+                @open="openPost"
+            />
+
+            <!-- Load more -->
+            <div class="text-center mt-6" v-if="hasMore || loadingMore">
+                <button
+                    @click="loadMore"
+                    :disabled="loadingMore"
+                    class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <span v-if="loadingMore">Carregando...</span>
+                    <span v-else>Ver mais</span>
+                </button>
+            </div>
+        </template>
+    </StandardLayout>
 </template>
 
 <style scoped>
