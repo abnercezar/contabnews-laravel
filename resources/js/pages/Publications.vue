@@ -191,31 +191,7 @@ export default {
 <template>
     <StandardLayout>
         <!-- Loading -->
-        <template v-if="loading && posts.length === 0">
-            <!-- <div class="flex items-center justify-center py-8 text-gray-500">
-                <svg
-                    class="animate-spin h-6 w-6 mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    ></circle>
-                    <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8z"
-                    ></path>
-                </svg>
-                Carregando publicações...
-            </div> -->
-        </template>
+        <template v-if="loading && posts.length === 0"> </template>
 
         <!-- Empty state -->
         <template v-else-if="!loading && posts.length === 0">
