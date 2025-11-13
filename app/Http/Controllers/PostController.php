@@ -24,8 +24,9 @@ class PostController extends Controller
         $cacheKey = "posts:page:{$page}:per:{$perPage}";
 
         $data = Cache::remember($cacheKey, 30, function () use ($perPage) {
-            // Ordenar pelos mais recentes primeiro. Ajuste o eager loading aqui se adicionar relações (->with('authorRelation')).
-            return Post::orderBy('created_at', 'desc')
+            // Ordenar pelos mais recentes primeiro e eager-load de comentários + usuário do comentário.
+            return Post::with(['comments.user'])
+                ->orderBy('created_at', 'desc')
                 ->paginate($perPage)
                 ->items();
         });

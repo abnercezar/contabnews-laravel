@@ -2,6 +2,7 @@
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import Modal from "../components/Modal.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+import { usePostsStore } from "../stores/posts";
 export default {
     name: "CreateContent",
     components: { MarkdownEditor, Modal },
@@ -114,6 +115,11 @@ export default {
                 this.modalTitle = "Sucesso";
                 this.modalMessage = "Sua publicação foi criada com sucesso!";
                 this.showModal = true;
+                // adiciona ao store de posts para que a listagem mostre imediatamente
+                try {
+                    const postsStore = usePostsStore();
+                    postsStore.addPost(data);
+                } catch (e) {}
                 // Redirecionar para a lista de publicações e passar o post criado
                 // Aguarda um pequeno timeout para que o usuário veja a mensagem
                 setTimeout(() => {

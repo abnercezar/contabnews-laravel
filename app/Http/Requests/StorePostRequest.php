@@ -8,7 +8,9 @@ class StorePostRequest extends FormRequest
 {
     protected function prepareForValidation()
     {
-        if ($this->has('author')) {
+        // Se o campo `author` não for enviado, explicitamente define como null
+        // para evitar que o model tente atribuir um valor não desejado.
+        if (! $this->has('author')) {
             $this->merge(['author' => null]);
         }
     }

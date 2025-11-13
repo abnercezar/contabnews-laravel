@@ -1,201 +1,119 @@
 <script>
-import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
-import PostList from "../components/PostList.vue";
 import StandardLayout from "../components/StandardLayout.vue";
+import { usePostsStore } from "../stores/posts";
+import PostList from "../components/PostList.vue";
 
 export default {
     name: "Publications",
-    components: { ConTabNewsIcon, PostList, StandardLayout },
+    components: { StandardLayout, PostList },
+    props: {
+        newPost: {
+            type: [Object, null],
+            default: null,
+        },
+    },
     data() {
         return {
-            isLoggedIn: false,
+            // lista de posts carregados da API
             posts: [],
-            loading: true,
-            page: 1,
-            perPage: 20,
-            hasMore: false,
-            loadingMore: false,
+            postsStore: null,
+            post: {
+                id: null,
+                title: "",
+                url: "#",
+                author: "",
+            },
+            comments: [],
+            newCommentText: "",
         };
     },
     mounted() {
-        // token pode ter outra chave dependendo do auth; ajuste se necessário
-        this.isLoggedIn =
-            !!localStorage.getItem("token") ||
-            localStorage.getItem("isLoggedIn") === "true";
-        this.fetchPosts();
-        // se estiver usando Inertia e veio newPost via props de servidor
-        this.tryAddNewPostFromPage();
-    },
-    methods: {
-        navigateTo(url) {
-            try {
-                if (
-                    this.$inertia &&
-                    typeof this.$inertia.visit === "function"
-                ) {
-                    this.$inertia.visit(url);
-                } else {
-                    window.location.href = url;
-                }
-            } catch (e) {
-                window.location.href = url;
-            }
-        },
-
-        async fetchPosts() {
-            this.loading = true;
-            this.page = 1;
-            this.hasMore = false;
-            try {
-                const res = await fetch(
-                    `/api/posts?page=${this.page}&per_page=${this.perPage}`,
-                    {
-                        headers: { Accept: "application/json" },
-                    }
-                );
-
-                if (!res.ok) {
-                    this.posts = [];
+        // usa o store do Pinia para gerenciar posts
+        try {
+            this.postsStore = usePostsStore();
+            // busca do backend (atualiza store.posts)
+            this.postsStore.fetchPosts().then(() => {
+                // se controller/inertia passou newPost, prioriza
+                if (this.newPost && typeof this.newPost === "object") {
+                    this.postsStore.addPost(this.newPost);
+                    this.post = Object.assign({}, this.newPost);
+                    this.comments = this.newPost.comments || [];
                     return;
                 }
 
-                const json = await res.json();
-                // aceita formato Laravel Resource Collection { data: [...], meta: {...} }
-                const dataArray = Array.isArray(json) ? json : json.data ?? [];
-                this.posts = Array.isArray(dataArray) ? dataArray : [];
-
-                // tenta inferir paginação/hasMore a partir de meta ou total
-                if (json.meta) {
-                    // estruturas comuns: meta.current_page, meta.last_page OR meta.has_more
-                    if (typeof json.meta.has_more !== "undefined") {
-                        this.hasMore = !!json.meta.has_more;
-                    } else if (
-                        typeof json.meta.current_page !== "undefined" &&
-                        typeof json.meta.last_page !== "undefined"
-                    ) {
-                        this.hasMore =
-                            json.meta.current_page < json.meta.last_page;
-                    } else {
-                        // fallback: se itens retornados == perPage, presume que pode haver mais
-                        this.hasMore = this.posts.length === this.perPage;
-                    }
-                } else {
-                    this.hasMore = this.posts.length === this.perPage;
+                // preenche lista local (a lista reativa principal deve vir do store)
+                this.posts = this.postsStore.posts || [];
+                if (this.posts.length > 0) {
+                    this.post = this.posts[0];
+                    this.comments = this.post.comments || [];
                 }
-
-                // se newPost foi passado via Inertia, adiciona no topo (tenta com segurança)
-                this.tryAddNewPostFromPage();
-            } catch (e) {
-                this.posts = [];
-                // opcional: console.error(e)
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        tryAddNewPostFromPage() {
+            });
+        } catch (e) {
+            // se pinia não estiver disponível, fallback simples
+        }
+    },
+    computed: {
+        postsList() {
             try {
-                const newPost =
-                    this.$page && this.$page.props && this.$page.props.newPost
-                        ? this.$page.props.newPost
-                        : null;
-                if (!newPost) return;
-
-                const exists = this.posts.some(
-                    (p) =>
-                        (p.id && newPost.id && p.id === newPost.id) ||
-                        (p.title && newPost.title && p.title === newPost.title)
+                return (
+                    (this.postsStore && this.postsStore.posts) ||
+                    this.posts ||
+                    []
                 );
-                if (!exists) this.posts.unshift(newPost);
             } catch (e) {
-                // swallow
+                return this.posts || [];
             }
         },
-
-        goToCreateContent() {
-            const isLogged =
-                (typeof window !== "undefined" &&
-                    !!localStorage.getItem("token")) ||
-                localStorage.getItem("isLoggedIn") === "true";
-
-            if (!isLogged) {
-                try {
-                    localStorage.setItem("intendedPath", "/content/create");
-                } catch (e) {
-                    // ignore localStorage errors
-                }
-                this.navigateTo("/login");
-                return;
-            }
-
-            this.navigateTo("/content/create");
-        },
-
-        openPost(id) {
-            console.log("[Publications] openPost id:", id);
-            if (!id) {
-                console.warn("[Publications] openPost called without id");
-                return;
-            }
-            const url = `/content/${id}`;
+    },
+    methods: {
+        openPostItem(item) {
+            const id = item?.id ?? item?.post_id ?? null;
+            const url = id ? `/content/${id}` : item?.url ?? "#";
             try {
-                this.navigateTo(url);
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
             } catch (e) {
-                console.warn(
-                    "[Publications] navigateTo failed, fallback to location.href",
-                    e
-                );
                 window.location.href = url;
             }
         },
-
-        async loadMore() {
-            if (this.loadingMore) return;
-            this.loadingMore = true;
+        // handler para o PostList emitir um open com id
+        openById(id) {
+            if (!id) return;
+            const url = `/content/${id}`;
             try {
-                const nextPage = this.page + 1;
-                const res = await fetch(
-                    `/api/posts?page=${nextPage}&per_page=${this.perPage}`,
-                    {
-                        headers: { Accept: "application/json" },
-                    }
-                );
-                if (!res.ok) return;
-
-                const json = await res.json();
-                const dataArray = Array.isArray(json) ? json : json.data ?? [];
-                const newPosts = Array.isArray(dataArray) ? dataArray : [];
-
-                // acrescenta sem duplicar (por segurança)
-                newPosts.forEach((p) => {
-                    const exists = this.posts.some(
-                        (x) => x.id && p.id && x.id === p.id
-                    );
-                    if (!exists) this.posts.push(p);
-                });
-
-                // atualizar page e hasMore
-                this.page = nextPage;
-                if (json.meta) {
-                    if (typeof json.meta.has_more !== "undefined") {
-                        this.hasMore = !!json.meta.has_more;
-                    } else if (
-                        typeof json.meta.current_page !== "undefined" &&
-                        typeof json.meta.last_page !== "undefined"
-                    ) {
-                        this.hasMore =
-                            json.meta.current_page < json.meta.last_page;
-                    } else {
-                        this.hasMore = newPosts.length === this.perPage;
-                    }
-                } else {
-                    this.hasMore = newPosts.length === this.perPage;
-                }
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
             } catch (e) {
-                // ignore
-            } finally {
-                this.loadingMore = false;
+                window.location.href = url;
             }
+        },
+        openComment(comment) {
+            const postId =
+                comment?.post_id ?? comment?.postId ?? this.post?.id ?? null;
+            const url = postId ? `/content/${postId}` : comment?.url ?? "#";
+            try {
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
+            } catch (e) {
+                window.location.href = url;
+            }
+        },
+        addComment() {
+            if (!this.newCommentText.trim()) return;
+            const newComment = {
+                id: Date.now(),
+                text: this.newCommentText.trim(),
+                tabcoins: 0,
+                replies: 0,
+                username: "Você",
+                time: "Agora",
+                url: "#",
+            };
+            this.comments.push(newComment);
+            this.newCommentText = "";
         },
     },
 };
@@ -203,64 +121,19 @@ export default {
 
 <template>
     <StandardLayout>
-        <!-- Loading -->
-        <template v-if="loading && posts.length === 0"> </template>
-
-        <!-- Empty state -->
-        <template v-else-if="!loading && posts.length === 0">
-            <div class="text-center py-8 text-gray-500">
-                Nenhuma publicação encontrada
+        <div class="mt-8 text-left">
+            <!-- Lista de publicações usando PostList -->
+            <div class="mb-4">
+                <PostList
+                    :posts="postsList"
+                    filter="Publicações"
+                    @open="openById"
+                />
             </div>
-            <div class="text-center">
-                <button
-                    @click="goToCreateContent"
-                    class="bg-[#daa520] text-white px-4 py-2 rounded font-bold hover:bg-[#d3ad71] transition"
-                >
-                    Publicar conteúdo
-                </button>
-            </div>
-        </template>
-
-        <!-- Posts list -->
-        <template v-else>
-            <!-- Featured / first post (se existir) -->
-            <div v-if="posts[0]" class="mb-6">
-                <a
-                    href="#"
-                    @click.prevent="openPost(posts[0].id)"
-                    class="text-green-600 font-extrabold text-2xl hover:underline"
-                >
-                    {{ posts[0].title }}
-                </a>
-                <div class="text-sm text-gray-500 mt-1">
-                    Contribuindo com
-                    {{ posts[0].author || "Anônimo" }}
-                </div>
-            </div>
-
-            <!-- Lista de posts usando componente reutilizável (começa no índice 2) -->
-            <PostList
-                :posts="posts.slice(1)"
-                :start="2"
-                :show-actions="false"
-                @open="openPost"
-            />
-
-            <!-- Load more -->
-            <div class="text-center mt-6" v-if="hasMore || loadingMore">
-                <button
-                    @click="loadMore"
-                    :disabled="loadingMore"
-                    class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <span v-if="loadingMore">Carregando...</span>
-                    <span v-else>Ver mais</span>
-                </button>
-            </div>
-        </template>
+        </div>
     </StandardLayout>
 </template>
 
 <style scoped>
-/* Você pode ajustar estilos locais aqui, se desejar */
+/* Estilo local para cards e hover */
 </style>

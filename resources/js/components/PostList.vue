@@ -60,13 +60,13 @@
                     <div
                         class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap"
                     >
-                        <span>{{ post.coin }}</span>
+                        <span>{{ tabcoinsLabel(post) }}</span>
                         <span>·</span>
-                        <span>{{ post.comments }}</span>
+                        <span>{{ commentsLabel(post) }}</span>
                         <span>·</span>
-                        <span>{{ post.author }}</span>
+                        <span>{{ authorLabel(post) }}</span>
                         <span>·</span>
-                        <span>{{ post.time }}</span>
+                        <span>{{ timeLabel(post) }}</span>
                     </div>
                 </div>
             </div>
@@ -105,6 +105,59 @@ export default {
             } else {
                 console.warn("[PostList] item has no id, cannot open:", item);
                 // no id -> allow native navigation (href may point to external)
+            }
+        },
+        tabcoinsLabel(post) {
+            const n =
+                post?.coin ??
+                post?.tabcoins ??
+                post?.coins ??
+                post?.tabcash ??
+                0;
+            const num = Number(n) || 0;
+            return `${num} ${num === 1 ? "tabcoin" : "tabcoins"}`;
+        },
+        commentsLabel(post) {
+            let n = 0;
+            if (Array.isArray(post?.comments)) n = post.comments.length;
+            else if (typeof post?.comments === "number") n = post.comments;
+            else if (typeof post?.comments_count === "number")
+                n = post.comments_count;
+            else if (typeof post?.commentsCount === "number")
+                n = post.commentsCount;
+            const plural = n === 1 ? "comentário" : "comentários";
+            return `${n} ${plural}`;
+        },
+        authorLabel(post) {
+            return (
+                post?.author ||
+                post?.user?.name ||
+                post?.contributor ||
+                post?.author_name ||
+                "Anônimo"
+            );
+        },
+        timeLabel(post) {
+            if (post?.time) return post.time;
+            const date = post?.created_at || post?.createdAt || post?.time;
+            if (!date) return "";
+            try {
+                const then = new Date(date);
+                const diff = Math.floor((Date.now() - then.getTime()) / 1000);
+                if (diff < 5) return "Agora";
+                if (diff < 60) return `${diff} segundos atrás`;
+                const minutes = Math.floor(diff / 60);
+                if (minutes < 60)
+                    return `${minutes} ${
+                        minutes === 1 ? "minuto" : "minutos"
+                    } atrás`;
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24)
+                    return `${hours} ${hours === 1 ? "hora" : "horas"} atrás`;
+                const days = Math.floor(hours / 24);
+                return `${days} ${days === 1 ? "dia" : "dias"} atrás`;
+            } catch (e) {
+                return "";
             }
         },
     },
