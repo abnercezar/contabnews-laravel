@@ -1,136 +1,3 @@
-<template>
-    <div class="max-w-4xl mx-auto py-8">
-        <!-- Title row with small index marker on the left like Tabnews -->
-        <div class="flex items-start gap-4">
-            <div class="w-10 flex-shrink-0 flex flex-col items-center gap-1">
-                <button
-                    @click.prevent="vote('up')"
-                    class="text-green-600 hover:text-green-800"
-                >
-                    ▲
-                </button>
-                <div class="text-sm font-semibold">
-                    {{ post.tabcoins ?? 0 }}
-                </div>
-                <button
-                    @click.prevent="vote('down')"
-                    class="text-red-500 hover:text-red-700"
-                >
-                    ▼
-                </button>
-            </div>
-
-            <div class="flex-1">
-                <h1 class="text-4xl font-extrabold mb-2 leading-tight">
-                    {{ post.title }}
-                </h1>
-                <div class="text-sm text-gray-500 mb-4">
-                    Por {{ post.author ? post.author : "Anônimo" }} •
-                    {{ formattedDate }}
-                </div>
-
-                <div class="prose prose-lg mb-6" v-html="post.content"></div>
-
-                <div v-if="post.source_url" class="mb-6 text-sm">
-                    <a
-                        :href="post.source_url"
-                        target="_blank"
-                        class="text-blue-600 hover:underline"
-                        >Fonte: {{ post.source_url }}</a
-                    >
-                </div>
-
-                <!-- Reply card (collapsed) -->
-                <div class="mt-4">
-                    <div
-                        @click="openReply"
-                        class="reply-card cursor-pointer rounded border border-gray-200 bg-white p-4 flex items-center justify-between"
-                    >
-                        <div class="flex items-center gap-3">
-                            <button
-                                @click.stop="openReply"
-                                class="px-4 py-2 bg-white border rounded font-medium"
-                            >
-                                Responder
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <button
-                                @click.stop.prevent="share"
-                                class="p-2 rounded hover:bg-gray-100"
-                            >
-                                🔗
-                            </button>
-                        </div>
-                    </div>
-
-                    <transition name="fade">
-                        <div
-                            v-if="showReply"
-                            class="mt-4 border border-gray-200 rounded p-4 bg-white"
-                        >
-                            <textarea
-                                v-model="replyBody"
-                                rows="4"
-                                class="w-full p-2 border rounded"
-                                placeholder="Escreva sua resposta..."
-                            ></textarea>
-                            <div
-                                class="mt-2 flex items-center justify-end gap-2"
-                            >
-                                <button
-                                    @click="cancelReply"
-                                    class="px-3 py-1 text-sm"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    @click="submitReply"
-                                    :disabled="submitting"
-                                    class="px-4 py-2 bg-[#0066cc] text-white rounded text-sm"
-                                >
-                                    {{
-                                        submitting ? "Enviando..." : "Responder"
-                                    }}
-                                </button>
-                            </div>
-                            <div
-                                v-if="replyError"
-                                class="text-red-600 text-sm mt-2"
-                            >
-                                {{ replyError }}
-                            </div>
-                        </div>
-                    </transition>
-                </div>
-
-                <section class="mt-8">
-                    <h2 class="text-lg font-semibold mb-2">Comentários</h2>
-                    <ul>
-                        <li
-                            v-for="comment in post.comments"
-                            :key="comment.id"
-                            class="mb-3"
-                        >
-                            <div class="text-sm text-gray-700">
-                                <strong>{{
-                                    comment.user ? comment.user.name : "Anônimo"
-                                }}</strong>
-                            </div>
-                            <div class="text-base">{{ comment.body }}</div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-
-        <div class="mt-8 text-sm text-green-600">
-            Receba por email as mais importantes Notícias de Tecnologia do
-            mundo!
-        </div>
-    </div>
-</template>
-
 <script>
 export default {
     props: {
@@ -275,6 +142,141 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="max-w-4xl mx-auto py-8">
+        <!-- Title row with small index marker on the left like Tabnews -->
+        <div class="flex items-start gap-4">
+            <div class="w-10 flex-shrink-0 flex flex-col items-center gap-1">
+                <button
+                    @click.prevent="vote('up')"
+                    class="text-green-600 hover:text-green-800"
+                >
+                    ▲
+                </button>
+                <div class="text-sm font-semibold">
+                    {{ post.tabcoins ?? 0 }}
+                </div>
+                <button
+                    @click.prevent="vote('down')"
+                    class="text-red-500 hover:text-red-700"
+                >
+                    ▼
+                </button>
+            </div>
+
+            <div class="flex-1">
+                <h1 class="text-4xl font-extrabold mb-2 leading-tight">
+                    {{ post.title }}
+                </h1>
+                <div class="text-sm text-gray-500 mb-4">
+                    Por {{ post.author ? post.author : "Anônimo" }} •
+                    {{ formattedDate }}
+                </div>
+
+                <div class="prose prose-lg mb-6" v-html="post.content"></div>
+
+                <div v-if="post.source_url" class="mb-6 text-sm">
+                    <a
+                        :href="post.source_url"
+                        target="_blank"
+                        class="text-blue-600 hover:underline"
+                        >Fonte: {{ post.source_url }}</a
+                    >
+                </div>
+
+                <!-- Reply card / editor: o card é mostrado quando fechado e substituído pelo editor quando aberto -->
+                <div class="mt-4">
+                    <transition name="fade">
+                        <!-- Card colapsado -->
+                        <div
+                            v-if="!showReply"
+                            @click="openReply"
+                            class="reply-card cursor-pointer rounded border border-gray-200 bg-white p-4 flex items-center justify-between"
+                        >
+                            <div class="flex items-center gap-3">
+                                <button
+                                    @click.stop="openReply"
+                                    class="px-4 py-2 bg-white border rounded font-medium"
+                                >
+                                    Responder
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <button
+                                    @click.stop.prevent="share"
+                                    class="p-2 rounded hover:bg-gray-100"
+                                >
+                                    🔗
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Editor (substitui o card) -->
+                        <div
+                            v-else
+                            class="mt-0 border border-gray-200 rounded p-4 bg-white"
+                        >
+                            <textarea
+                                v-model="replyBody"
+                                rows="4"
+                                class="w-full p-2 border rounded"
+                                placeholder="Escreva sua resposta..."
+                            ></textarea>
+                            <div
+                                class="mt-2 flex items-center justify-end gap-2"
+                            >
+                                <button
+                                    @click="cancelReply"
+                                    class="px-3 py-1 text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    @click="submitReply"
+                                    :disabled="submitting"
+                                    class="px-4 py-2 bg-[#0066cc] text-white rounded text-sm"
+                                >
+                                    {{
+                                        submitting ? "Enviando..." : "Responder"
+                                    }}
+                                </button>
+                            </div>
+                            <div
+                                v-if="replyError"
+                                class="text-red-600 text-sm mt-2"
+                            >
+                                {{ replyError }}
+                            </div>
+                        </div>
+                    </transition>
+                </div>
+
+                <section class="mt-8">
+                    <h2 class="text-lg font-semibold mb-2">Comentários</h2>
+                    <ul>
+                        <li
+                            v-for="comment in post.comments"
+                            :key="comment.id"
+                            class="mb-3"
+                        >
+                            <div class="text-sm text-gray-700">
+                                <strong>{{
+                                    comment.user ? comment.user.name : "Anônimo"
+                                }}</strong>
+                            </div>
+                            <div class="text-base">{{ comment.body }}</div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <div class="mt-8 text-sm text-green-600">
+            Receba por email as mais importantes Notícias de CRM do mundo!
+        </div>
+    </div>
+</template>
 
 <style scoped>
 .prose img {
