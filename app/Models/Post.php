@@ -18,9 +18,26 @@ class Post extends Model
         'body',
         'source_url',
         'isSponsoredContent',
+        'is_sponsored',
         'content',
         'time',
     ];
+
+    protected $casts = [
+        'is_sponsored' => 'boolean',
+    ];
+
+    // permite usar $post->isSponsoredContent e mapear para coluna is_sponsored
+    public function getIsSponsoredContentAttribute()
+    {
+        // Eloquent normaliza nomes, então verifica a coluna snake_case
+        return (bool) ($this->attributes['is_sponsored'] ?? false);
+    }
+
+    public function setIsSponsoredContentAttribute($value)
+    {
+        $this->attributes['is_sponsored'] = (bool) $value;
+    }
 
     // adiciona contadores computados de reações ao modelo serializado
     protected $appends = ['tabcoins', 'tabcashs'];

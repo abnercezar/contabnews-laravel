@@ -42,7 +42,7 @@ export default {
             default: "Recentes",
         },
     },
-    emits: ["tab-changed"],
+    emits: ["tab-changed", "subtab-changed"],
     data() {
         return {
             // usa a store do Pinia para o estado de auth; uma flag local permanece para compatibilidade, mas é atualizada pela store

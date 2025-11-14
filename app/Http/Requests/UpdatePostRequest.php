@@ -18,6 +18,7 @@ class UpdatePostRequest extends FormRequest
             'content' => 'sometimes|string|max:20000',
             'source_url' => 'nullable|url',
             'isSponsoredContent' => 'boolean',
+            'is_sponsored' => 'boolean',
         ];
     }
 }

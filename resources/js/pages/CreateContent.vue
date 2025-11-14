@@ -45,13 +45,15 @@ export default {
                     }
                 } catch (e) {}
 
+                const headers = {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                };
+                if (token) headers.Authorization = `Bearer ${token}`;
+
                 const response = await fetch("/api/posts", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                        Authorization: token ? `Bearer ${token}` : undefined,
-                    },
+                    headers,
                     body: JSON.stringify(payload),
                 });
                 let data;

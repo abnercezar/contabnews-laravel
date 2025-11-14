@@ -23,8 +23,7 @@ export default {
                 url: "#",
                 author: "",
             },
-            comments: [],
-            newCommentText: "",
+            // comentários removidos da lista de publicações
         };
     },
     mounted() {
@@ -37,7 +36,6 @@ export default {
                 if (this.newPost && typeof this.newPost === "object") {
                     this.postsStore.addPost(this.newPost);
                     this.post = Object.assign({}, this.newPost);
-                    this.comments = this.newPost.comments || [];
                     return;
                 }
 
@@ -45,7 +43,6 @@ export default {
                 this.posts = this.postsStore.posts || [];
                 if (this.posts.length > 0) {
                     this.post = this.posts[0];
-                    this.comments = this.post.comments || [];
                 }
             });
         } catch (e) {
@@ -90,30 +87,12 @@ export default {
             }
         },
         openComment(comment) {
-            const postId =
-                comment?.post_id ?? comment?.postId ?? this.post?.id ?? null;
-            const url = postId ? `/content/${postId}` : comment?.url ?? "#";
-            try {
-                if (this.$inertia && typeof this.$inertia.visit === "function")
-                    this.$inertia.visit(url);
-                else window.location.href = url;
-            } catch (e) {
-                window.location.href = url;
-            }
+            // função removida do fluxo de Publicações (comentários não exibidos aqui)
+            return;
         },
         addComment() {
-            if (!this.newCommentText.trim()) return;
-            const newComment = {
-                id: Date.now(),
-                text: this.newCommentText.trim(),
-                tabcoins: 0,
-                replies: 0,
-                username: "Você",
-                time: "Agora",
-                url: "#",
-            };
-            this.comments.push(newComment);
-            this.newCommentText = "";
+            // comentários removidos da lista de publicações
+            return;
         },
     },
 };

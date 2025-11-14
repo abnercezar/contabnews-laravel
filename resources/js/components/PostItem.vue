@@ -1,4 +1,7 @@
 <script>
+import Modal from "./Modal.vue";
+import InlineToast from "./InlineToast.vue";
+
 export default {
     name: "PostItem",
     props: {
@@ -7,6 +10,7 @@ export default {
         currentUser: Object,
         showActions: { type: Boolean, default: true },
         compact: { type: Boolean, default: false },
+        showComments: { type: Boolean, default: true },
     },
     computed: {
         isAuthor() {
@@ -37,22 +41,50 @@ export default {
             }
         },
     },
+    components: { Modal, InlineToast },
+    data() {
+        return {
+            actionError: "",
+            showDeleteModal: false,
+            deleteLoading: false,
+            deleteError: "",
+            toastMessage: "",
+            showToast: false,
+        };
+    },
     methods: {
         onOpen() {
             // Novo comportamento: emitir evento em vez de navegar direto
             this.$emit("open", this.post.id);
         },
-        async deletePost() {
-            if (!confirm("Tem certeza que deseja excluir este post?")) return;
+        confirmDelete() {
+            this.deleteError = "";
+            this.actionError = "";
+            this.showDeleteModal = true;
+        },
+        async performDelete() {
+            if (!this.post || !this.post.id) return;
+            this.deleteLoading = true;
             try {
+                const token = localStorage.getItem("token");
+                const headers = { Accept: "application/json" };
+                if (token) headers.Authorization = `Bearer ${token}`;
                 const res = await fetch(`/api/posts/${this.post.id}`, {
                     method: "DELETE",
-                    headers: { Accept: "application/json" },
+                    headers,
                 });
-                if (!res.ok) throw new Error("delete failed");
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    this.deleteError = data.message || "Erro ao apagar publicação";
+                    return;
+                }
                 this.$emit("deleted", this.post);
-            } catch {
-                alert("Erro ao excluir o post");
+                this.showDeleteModal = false;
+            } catch (err) {
+                console.error(err);
+                this.deleteError = "Erro de rede ao apagar publicação.";
+            } finally {
+                this.deleteLoading = false;
             }
         },
         reply() {
@@ -74,18 +106,21 @@ export default {
         share() {
             try {
                 const url = `${window.location.origin}/content/${this.post.id}`;
-                if (navigator.share)
-                    navigator.share({ title: this.post.title, url });
+                if (navigator.share) navigator.share({ title: this.post.title, url });
                 else {
                     navigator.clipboard.writeText(url);
-                    alert("Link copiado para a área de transferência");
+                    this.toastMessage = "Link copiado para a área de transferência";
+                    this.showToast = true;
+                    setTimeout(() => (this.showToast = false), 2500);
                 }
             } catch {
                 try {
                     navigator.clipboard.writeText(
                         `${window.location.origin}/content/${this.post.id}`
                     );
-                    alert("Link copiado!");
+                    this.toastMessage = "Link copiado!";
+                    this.showToast = true;
+                    setTimeout(() => (this.showToast = false), 2500);
                 } catch {}
             }
         },
@@ -135,65 +170,52 @@ export default {
                     <span class="tabcoins text-[#006400] font-medium">
                         {{ tabcoinsLabel }}
                     </span>
-                    <span>·</span>
-                    <span class="comments">{{ commentsLabel }}</span>
-                    <span>·</span>
-                    <span class="author">{{ post.author || "Anônimo" }}</span>
+                    <span v-if="showComments">·</span>
+                    <span v-if="showComments" class="comments">{{ commentsLabel }}</span>
+                    <span v-if="showComments">·</span>
+                    <span v-if="post.author" class="author">{{ post.author }}</span>
                     <span>·</span>
                     <span class="time">{{ formattedDate }}</span>
                 </div>
 
                 <div class="actions flex items-center gap-3">
-                    <button
-                        v-if="showActions"
-                        @click="reply"
-                        class="text-sm text-[#0066cc] hover:underline"
-                    >
-                        Responder
-                    </button>
-
-                    <button
-                        v-if="showActions"
-                        @click="share"
-                        class="text-sm px-2 py-1 border rounded bg-white hover:bg-gray-50 flex items-center justify-center"
-                        aria-label="Compartilhar"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4 text-gray-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15 8a3 3 0 10-2.83-4H7a2 2 0 00-2 2v10a2 2 0 002 2h6.17A3 3 0 1015 16"
-                            />
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15 8v4m0 0l3-3m-3 3l-3-3"
-                            />
-                        </svg>
-                    </button>
 
                     <div v-if="isAuthor" class="ml-auto flex gap-2 text-sm">
                         <button
                             @click="$emit('edit', post)"
-                            class="text-gray-600 hover:underline"
+                            class="text-gray-600 hover:underline flex items-center gap-1"
                         >
-                            Editar
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a1.875 1.875 0 012.651 2.651L8.454 16.197a1.875 1.875 0 01-.79.48L4 18l1.323-3.664a1.875 1.875 0 01.48-.79L16.862 3.487z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.5l-2.5-2.5" />
+                            </svg>
+                            <span>Editar</span>
                         </button>
                         <button
-                            @click="deletePost"
-                            class="text-red-600 hover:underline"
+                            @click="confirmDelete"
+                            class="text-red-600 hover:underline flex items-center gap-1"
                         >
-                            Excluir
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2" />
+                            </svg>
+                            <span>Excluir</span>
                         </button>
                     </div>
+                    <div v-if="actionError" class="ml-auto text-red-600 text-sm">{{ actionError }}</div>
+                    <Modal
+                        :visible="showDeleteModal"
+                        title="Apagar publicação"
+                        @confirm="performDelete"
+                        @cancel="showDeleteModal = false"
+                        :loading="deleteLoading"
+                        confirmText="Apagar"
+                        cancelText="Cancelar"
+                    >
+                        <div>Tem certeza que deseja excluir este post?</div>
+                        <div v-if="deleteError" class="text-red-600 text-sm mt-2">{{ deleteError }}</div>
+                    </Modal>
+                    <InlineToast :message="toastMessage" :visible="showToast" />
                 </div>
             </div>
         </div>

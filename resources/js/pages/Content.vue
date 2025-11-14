@@ -1,11 +1,15 @@
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
+import Modal from "../components/Modal.vue";
+import InlineToast from "../components/InlineToast.vue";
+import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
+import { usePostsStore } from "../stores/posts";
 
 export default {
     props: {
         post: Object,
     },
-    components: { MarkdownEditor },
+    components: { MarkdownEditor, Modal, InlineToast, PencilIcon, TrashIcon },
     data() {
         return {
             showReply: false,
@@ -14,12 +18,34 @@ export default {
             replyError: "",
             // id do comentário ao qual estamos respondendo (opcional)
             replyingToCommentId: null,
+            // menu/edit/delete UI
+            showMenu: false,
+            showEditModal: false,
+            editPost: null,
+            saving: false,
+            editErrors: {},
+            editError: "",
+            showDeleteModal: false,
+            deleteLoading: false,
+            deleteError: "",
+            toastMessage: "",
+            showToast: false,
+            localPost: null,
         };
+    },
+    created() {
+        // cria uma cópia local reativa do post para evitar mutações diretas na prop
+        this.localPost = this.post ? JSON.parse(JSON.stringify(this.post)) : {};
+    },
+    watch: {
+        post(newVal) {
+            this.localPost = newVal ? JSON.parse(JSON.stringify(newVal)) : {};
+        },
     },
     computed: {
         formattedDate() {
-            if (!this.post || !this.post.created_at) return "";
-            return new Date(this.post.created_at).toLocaleString();
+            if (!this.localPost || !this.localPost.created_at) return "";
+            return new Date(this.localPost.created_at).toLocaleString();
         },
     },
     methods: {
@@ -75,7 +101,7 @@ export default {
                 this.replyError = "Digite sua resposta antes de enviar.";
                 return;
             }
-            const intended = `/content/create?replyTo=${this.post.id}`;
+            const intended = `/content/create?replyTo=${this.localPost.id}`;
             const token = localStorage.getItem("token");
             if (!token) {
                 try {
@@ -94,7 +120,7 @@ export default {
                         Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
-                        post_id: this.post.id,
+                        post_id: this.localPost.id,
                         body: this.replyBody,
                         parent_id: this.replyingToCommentId,
                     }),
@@ -106,8 +132,8 @@ export default {
                     return;
                 }
                 const comment = await res.json();
-                if (!this.post.comments) this.post.comments = [];
-                this.post.comments.unshift(comment);
+                if (!this.localPost.comments) this.localPost.comments = [];
+                this.localPost.comments.unshift(comment);
                 this.cancelReply();
             } catch (e) {
                 this.replyError = "Erro de rede ao enviar comentário.";
@@ -119,16 +145,129 @@ export default {
             try {
                 const url = window.location.href;
                 if (navigator.share) {
-                    navigator.share({ title: this.post.title, url });
+                    navigator.share({ title: this.localPost.title, url });
                 } else {
                     navigator.clipboard.writeText(url);
-                    alert("Link copiado para a área de transferência");
+                    this.toastMessage = "Link copiado para a área de transferência";
+                    this.showToast = true;
+                    setTimeout(() => (this.showToast = false), 2500);
                 }
             } catch (e) {
                 // fallback
                 try {
                     navigator.clipboard.writeText(window.location.href);
                 } catch (e) {}
+            }
+        },
+        shareComment(comment) {
+            try {
+                const url = window.location.origin + window.location.pathname + '#comment-' + comment.id;
+                if (navigator.share) navigator.share({ title: this.localPost.title, url });
+                else {
+                    navigator.clipboard.writeText(url);
+                    this.toastMessage = 'Link do comentário copiado';
+                    this.showToast = true;
+                    setTimeout(() => (this.showToast = false), 2500);
+                }
+            } catch (e) {
+                try {
+                    navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#comment-' + comment.id);
+                    this.toastMessage = 'Link do comentário copiado';
+                    this.showToast = true;
+                    setTimeout(() => (this.showToast = false), 2500);
+                } catch (e) {}
+            }
+        },
+        // three-dots menu handlers
+        toggleMenu() {
+            this.showMenu = !this.showMenu;
+        },
+        openEditModal() {
+            this.showMenu = false;
+            this.editPost = Object.assign({}, this.localPost);
+            this.showEditModal = true;
+        },
+        async submitEdit() {
+            if (!this.editPost || !this.editPost.id) return;
+            this.saving = true;
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`/api/posts/${this.editPost.id}`, {
+                    method: "PUT",
+                    headers: Object.assign(
+                        { "Content-Type": "application/json" },
+                        token ? { Authorization: `Bearer ${token}` } : {}
+                    ),
+                    body: JSON.stringify({
+                        title: this.editPost.title,
+                        content:
+                            this.editPost.content ||
+                            this.editPost.body ||
+                            this.editPost.comment ||
+                            "",
+                        source_url: this.editPost.source_url,
+                        isSponsoredContent: !!this.editPost.isSponsoredContent,
+                    }),
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data && data.errors) {
+                        this.editErrors = data.errors;
+                    } else {
+                        this.editError = data.message || "Erro ao atualizar publicação";
+                    }
+                    return;
+                }
+                const updated = await res.json();
+                // atualiza cópia local do post
+                try {
+                    for (const k in updated) {
+                        this.localPost[k] = updated[k];
+                    }
+                } catch (e) {
+                    this.localPost = Object.assign({}, this.localPost, updated);
+                }
+                // atualiza store de posts para manter a listagem sincronizada
+                try {
+                    const postsStore = usePostsStore();
+                    postsStore.addPost(updated);
+                } catch (e) {}
+                this.showEditModal = false;
+                this.editPost = null;
+            } catch (e) {
+                console.error("Erro ao salvar edição", e);
+                this.editError = "Erro de rede ao atualizar publicação.";
+            } finally {
+                this.saving = false;
+            }
+        },
+        confirmDelete() {
+            this.showMenu = false;
+            this.showDeleteModal = true;
+            this.deleteLoading = false;
+        },
+        async deletePost() {
+            if (!this.localPost || !this.localPost.id) return;
+            this.deleteLoading = true;
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`/api/posts/${this.localPost.id}`, {
+                    method: "DELETE",
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    this.deleteError = data.message || "Erro ao apagar publicação";
+                    return;
+                }
+                // redirect to publications
+                window.location.href = "/publications";
+            } catch (e) {
+                console.error("Erro ao apagar", e);
+                this.deleteError = "Erro de rede ao apagar publicação.";
+            } finally {
+                this.deleteLoading = false;
+                this.showDeleteModal = false;
             }
         },
         async vote(type) {
@@ -145,7 +284,7 @@ export default {
             }
             try {
                 const res = await fetch(
-                    `/api/posts/${this.post.id}/reactions`,
+                    `/api/posts/${this.localPost.id}/reactions`,
                     {
                         method: "POST",
                         headers: {
@@ -158,8 +297,8 @@ export default {
                 );
                 if (!res.ok) return;
                 const data = await res.json();
-                this.$set(this.post, "tabcoins", data.tabcoins);
-                this.$set(this.post, "tabcashs", data.tabcashs);
+                this.localPost.tabcoins = data.tabcoins;
+                this.localPost.tabcashs = data.tabcashs;
             } catch (e) {
                 console.error(e);
             }
@@ -180,7 +319,7 @@ export default {
                     ▲
                 </button>
                 <div class="text-sm font-semibold">
-                    {{ post.tabcoins ?? 0 }}
+                    {{ localPost.tabcoins ?? 0 }}
                 </div>
                 <button
                     @click.prevent="vote('down')"
@@ -191,12 +330,51 @@ export default {
             </div>
 
             <div class="flex-1">
-                <h1 class="text-4xl font-extrabold mb-2 leading-tight">
-                    {{ post.title }}
-                </h1>
-                <div class="text-sm text-gray-500 mb-4">
-                    Por {{ post.author ? post.author : "Anônimo" }} •
-                    {{ formattedDate }}
+                <div class="flex items-start justify-between">
+                    <div class="pr-4">
+                            <h1 class="text-4xl font-extrabold mb-2 leading-tight">
+                            {{ localPost.title }}
+                        </h1>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Por {{ localPost.author ? localPost.author : "Anônimo" }} •
+                            {{ formattedDate }}
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <button
+                            @click.stop="toggleMenu"
+                            class="p-1 rounded hover:bg-gray-100"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-500"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                            </svg>
+                        </button>
+                        <div
+                            v-if="showMenu"
+                            class="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-20"
+                        >
+                            <button
+                                @click="openEditModal"
+                                class="w-full text-left px-4 py-2 hover:bg-gray-50"
+                            >
+                                Editar
+                            </button>
+                            <button
+                                @click="confirmDelete"
+                                class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50"
+                            >
+                                Apagar
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -207,17 +385,104 @@ export default {
                             'Segoe UI', Roboto, 'Helvetica Neue', Arial;
                     "
                 >
-                    {{ post.content }}
+                    {{ localPost.content }}
                 </div>
 
-                <div v-if="post.source_url" class="mb-6 text-sm">
+                <div v-if="localPost.source_url" class="mb-6 text-sm">
                     <a
-                        :href="post.source_url"
+                        :href="localPost.source_url"
                         target="_blank"
                         class="text-blue-600 hover:underline"
-                        >Fonte: {{ post.source_url }}</a
+                        >Fonte: {{ localPost.source_url }}</a
                     >
                 </div>
+
+                <!-- Edit modal -->
+                <div
+                    v-if="showEditModal"
+                    class="fixed inset-0 z-40 flex items-center justify-center"
+                >
+                    <div
+                        class="absolute inset-0 bg-black opacity-50"
+                        @click="showEditModal = false"
+                    ></div>
+                    <div
+                        class="relative bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 p-6"
+                    >
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <PencilIcon class="h-5 w-5 text-gray-600" />
+                            <span>Editar publicação</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Título</label
+                                >
+                                <input
+                                    v-model="editPost.title"
+                                    class="mt-1 block w-full border rounded px-3 py-2"
+                                />
+                                <div v-if="editErrors.title" class="text-red-600 text-sm mt-1">{{ editErrors.title[0] }}</div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Conteúdo</label
+                                >
+                                <MarkdownEditor
+                                    v-model="editPost.content"
+                                    placeholder="Conteúdo da publicação"
+                                />
+                                <div v-if="editErrors.content" class="text-red-600 text-sm mt-1">{{ editErrors.content[0] }}</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-2"
+                                    ><input
+                                        type="checkbox"
+                                        v-model="editPost.isSponsoredContent"
+                                    />
+                                    Publicação patrocinada</label
+                                >
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end gap-2">
+                            <button
+                                @click="showEditModal = false"
+                                class="px-4 py-2 bg-gray-100 rounded"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                @click="submitEdit"
+                                :disabled="saving"
+                                class="px-4 py-2 bg-[#d3ad71] text-white rounded hover:bg-[#bfae76]"
+                            >
+                                Salvar
+                            </button>
+                        </div>
+                        <div v-if="editError" class="text-red-600 text-sm mt-2">{{ editError }}</div>
+                    </div>
+                </div>
+
+                <!-- Delete confirmation modal using Modal component -->
+                <Modal
+                    :visible="showDeleteModal"
+                    title="Apagar publicação"
+                    @confirm="deletePost"
+                    @cancel="showDeleteModal = false"
+                    :loading="deleteLoading"
+                    confirmText="Apagar"
+                    cancelText="Cancelar"
+                >
+                    <div class="flex items-start gap-3">
+                        <TrashIcon class="h-6 w-6 text-red-600 mt-0.5" />
+                        <div>
+                            <div>Tem certeza que deseja apagar esta publicação?</div>
+                            <div v-if="deleteError" class="text-red-600 text-sm mt-2">{{ deleteError }}</div>
+                        </div>
+                    </div>
+                </Modal>
 
                 <!-- Reply card / editor: o card é mostrado quando fechado e substituído pelo editor quando aberto -->
                 <div class="mt-4">
@@ -284,81 +549,15 @@ export default {
                     </transition>
                 </div>
 
-                <section class="mt-8">
-                    <h2 class="text-lg font-semibold mb-2">Comentários</h2>
-                    <ul>
-                        <li
-                            v-for="comment in post.comments"
-                            :key="comment.id"
-                            :id="'comment-' + comment.id"
-                            class="mb-3 border-b pb-3"
-                        >
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <div class="text-sm text-gray-700">
-                                        <strong>{{
-                                            comment.user
-                                                ? comment.user.name
-                                                : "Anônimo"
-                                        }}</strong>
-                                    </div>
-                                    <div
-                                        class="text-base mt-1 leading-relaxed text-gray-800"
-                                        style="white-space: pre-wrap"
-                                    >
-                                        {{ comment.body }}
-                                    </div>
-                                </div>
-                                <div
-                                    class="flex flex-col items-end gap-2 text-sm"
-                                >
-                                    <button
-                                        @click="openReply(comment)"
-                                        class="text-[#0066cc] hover:underline"
-                                    >
-                                        Responder
-                                    </button>
-                                    <button
-                                        @click.prevent="
-                                            (function () {
-                                                try {
-                                                    const url =
-                                                        window.location.origin +
-                                                        window.location
-                                                            .pathname +
-                                                        '#comment-' +
-                                                        comment.id;
-                                                    if (navigator.share)
-                                                        navigator.share({
-                                                            title: post.title,
-                                                            url,
-                                                        });
-                                                    else {
-                                                        navigator.clipboard.writeText(
-                                                            url
-                                                        );
-                                                        alert(
-                                                            'Link do comentário copiado'
-                                                        );
-                                                    }
-                                                } catch (e) {}
-                                            })()
-                                        "
-                                        class="text-gray-600"
-                                    >
-                                        Compartilhar
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
+                <!-- Comentários removidos conforme solicitado -->
             </div>
         </div>
 
         <div class="mt-8 text-sm text-green-600">
             Receba por email as mais importantes Notícias de CRM do mundo!
         </div>
+    
+    <InlineToast :message="toastMessage" :visible="showToast" />
     </div>
 </template>
 

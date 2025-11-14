@@ -3,7 +3,7 @@
         <!-- Lista genérica: muda conforme a aba -->
         <div v-if="filter === 'Todos'" class="space-y-6">
             <div
-                v-for="(item, index) in allItems"
+                v-for="(item, index) in itemsToRender"
                 :key="index"
                 class="border-b border-gray-200 pb-4"
             >
@@ -17,29 +17,13 @@
                         {{ item.title }}
                     </a>
 
-                    <!-- Contribuidor -->
-                    <p class="text-sm text-gray-500 mt-1">
-                        Contribuindo com
-                        <span class="text-blue-600"
-                            >@{{ item.contributor }}</span
-                        >
-                    </p>
-
                     <!-- Conteúdo do comentário -->
-                    <p class="text-gray-700 mt-2 italic">
-                        "{{ item.comment }}"
-                    </p>
-
-                    <!-- Rodapé com tabcoins, comentários, autor e tempo (left-aligned dentro da mesma caixa) -->
-                    <div
-                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap"
-                    >
+                    <!-- Rodapé com tabcoins, autor e tempo (comentários removidos conforme solicitado) -->
+                    <div class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap">
                         <span>{{ item.tabcoins }} tabcoin</span>
                         <span>·</span>
-                        <span>{{ item.comments }} comentário</span>
-                        <span>·</span>
-                        <span>{{ item.author }}</span>
-                        <span>·</span>
+                        <span v-if="authorLabel(item)">{{ authorLabel(item) }}</span>
+                        <span v-if="authorLabel(item)">·</span>
                         <span>{{ item.time }}</span>
                     </div>
                 </div>
@@ -48,33 +32,48 @@
 
         <!-- Outras abas (ex: Publicações, Comentários, etc) -->
         <div v-else class="space-y-4">
-            <div v-for="(post, index) in posts" :key="index" class="pb-3">
+            <div
+                v-for="(post, index) in posts"
+                :key="index"
+                class="pb-3 relative"
+            >
                 <div class="mx-auto max-w-2xl text-left">
-                    <a
-                        :href="itemUrl(post)"
-                        class="block text-base font-semibold text-gray-900 hover:text-blue-600"
-                        @click="handleOpen(post, $event)"
-                    >
-                        {{ post.title }}
-                    </a>
-                    <div
-                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap"
-                    >
+                    <div class="flex items-start justify-between">
+                        <a
+                            :href="itemUrl(post)"
+                            class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                            @click="handleOpen(post, $event)"
+                        >
+                            {{ post.title }}
+                        </a>
+
+                        <!-- menu moved to Content page (three-dots now shown in content view) -->
+                    </div>
+
+                    <div class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
                         <span>{{ tabcoinsLabel(post) }}</span>
-                        <span>·</span>
-                        <span>{{ commentsLabel(post) }}</span>
                         <span>·</span>
                         <span>{{ authorLabel(post) }}</span>
                         <span>·</span>
                         <span>{{ timeLabel(post) }}</span>
+                        <!-- Badge visual para posts patrocinados -->
+                        <span
+                            v-if="isSponsored(post)"
+                            class="ml-2 inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full"
+                            >Anúncio</span
+                        >
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- edit modal moved to Content page -->
     </div>
 </template>
 
 <script>
+import axios from "axios";
+import { usePostsStore } from "../stores/posts";
 export default {
     props: {
         posts: Array,
@@ -134,7 +133,7 @@ export default {
                 post?.user?.name ||
                 post?.contributor ||
                 post?.author_name ||
-                "Anônimo"
+                ""
             );
         },
         timeLabel(post) {
@@ -159,6 +158,35 @@ export default {
             } catch (e) {
                 return "";
             }
+        },
+        isSponsored(post) {
+            if (!post) return false;
+            // use flag normalizado quando disponível
+            if (typeof post.__isSponsored !== "undefined")
+                return !!post.__isSponsored;
+            return !!(
+                post?.isSponsoredContent ||
+                post?.isSponsored ||
+                post?.is_sponsored ||
+                post?.is_sponsored_content ||
+                post?.sponsored ||
+                post?.sponsored_at ||
+                post?.sponsor_id ||
+                post?.sponsored_until
+            );
+        },
+        // UI helpers remain in PostList but editing/deleting happens in Content page
+    },
+    computed: {
+        itemsToRender() {
+            // Quando houver posts reais (passados via prop), use-os.
+            // Caso contrário, caia para os dados de exemplo `allItems`.
+            if (this.filter === "Todos") {
+                return this.posts && this.posts.length
+                    ? this.posts
+                    : this.allItems;
+            }
+            return this.posts || [];
         },
     },
     data() {
@@ -197,6 +225,7 @@ export default {
                     time: "29 minutos atrás",
                 },
             ],
+            // UI state (no menu/modals here; actions handled in Content view)
         };
     },
 };
