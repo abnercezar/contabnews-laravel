@@ -401,15 +401,21 @@ export default {
                         >
                             <button
                                 @click="openEditModal"
-                                class="w-full text-left px-4 py-2 hover:bg-gray-50"
+                                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center"
                             >
-                                Editar
+                                <PencilIcon
+                                    class="h-4 w-4 inline-block mr-2 text-gray-600"
+                                />
+                                <span>Editar</span>
                             </button>
                             <button
                                 @click="confirmDelete"
-                                class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50"
+                                class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 flex items-center"
                             >
-                                Apagar
+                                <TrashIcon
+                                    class="h-4 w-4 inline-block mr-2 text-red-600"
+                                />
+                                <span>Apagar</span>
                             </button>
                         </div>
                     </div>
