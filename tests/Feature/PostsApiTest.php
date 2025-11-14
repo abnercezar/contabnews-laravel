@@ -13,7 +13,6 @@ test('lista posts publicamente com paginação', function () {
 
     $response->assertOk();
     $data = $response->json();
-    // Controller returns items() array for the page
     expect(is_array($data))->toBeTrue();
     expect(count($data))->toBe(2);
 });
@@ -45,7 +44,7 @@ test('criar post atribui autor do usuário autenticado', function () {
 
     $payload = [
         'title' => 'Criado por action',
-        'content' => 'Conteúdo',
+        'content' => 'Conteúdo criado por action',
     ];
 
     $response = $this->postJson('/api/posts', $payload);
