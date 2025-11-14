@@ -148,7 +148,8 @@ export default {
                     navigator.share({ title: this.localPost.title, url });
                 } else {
                     navigator.clipboard.writeText(url);
-                    this.toastMessage = "Link copiado para a área de transferência";
+                    this.toastMessage =
+                        "Link copiado para a área de transferência";
                     this.showToast = true;
                     setTimeout(() => (this.showToast = false), 2500);
                 }
@@ -161,18 +162,28 @@ export default {
         },
         shareComment(comment) {
             try {
-                const url = window.location.origin + window.location.pathname + '#comment-' + comment.id;
-                if (navigator.share) navigator.share({ title: this.localPost.title, url });
+                const url =
+                    window.location.origin +
+                    window.location.pathname +
+                    "#comment-" +
+                    comment.id;
+                if (navigator.share)
+                    navigator.share({ title: this.localPost.title, url });
                 else {
                     navigator.clipboard.writeText(url);
-                    this.toastMessage = 'Link do comentário copiado';
+                    this.toastMessage = "Link do comentário copiado";
                     this.showToast = true;
                     setTimeout(() => (this.showToast = false), 2500);
                 }
             } catch (e) {
                 try {
-                    navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#comment-' + comment.id);
-                    this.toastMessage = 'Link do comentário copiado';
+                    navigator.clipboard.writeText(
+                        window.location.origin +
+                            window.location.pathname +
+                            "#comment-" +
+                            comment.id
+                    );
+                    this.toastMessage = "Link do comentário copiado";
                     this.showToast = true;
                     setTimeout(() => (this.showToast = false), 2500);
                 } catch (e) {}
@@ -214,7 +225,8 @@ export default {
                     if (data && data.errors) {
                         this.editErrors = data.errors;
                     } else {
-                        this.editError = data.message || "Erro ao atualizar publicação";
+                        this.editError =
+                            data.message || "Erro ao atualizar publicação";
                     }
                     return;
                 }
@@ -257,7 +269,8 @@ export default {
                 });
                 if (!res.ok) {
                     const data = await res.json().catch(() => ({}));
-                    this.deleteError = data.message || "Erro ao apagar publicação";
+                    this.deleteError =
+                        data.message || "Erro ao apagar publicação";
                     return;
                 }
                 // redirect to publications
@@ -332,11 +345,15 @@ export default {
             <div class="flex-1">
                 <div class="flex items-start justify-between">
                     <div class="pr-4">
-                            <h1 class="text-4xl font-extrabold mb-2 leading-tight">
+                        <h1 class="text-4xl font-extrabold mb-2 leading-tight">
                             {{ localPost.title }}
                         </h1>
                         <div class="text-sm text-gray-500 mb-4">
-                            Por {{ localPost.author ? localPost.author : "Anônimo" }} •
+                            Por
+                            {{
+                                localPost.author ? localPost.author : "Anônimo"
+                            }}
+                            •
                             {{ formattedDate }}
                         </div>
                     </div>
@@ -409,7 +426,9 @@ export default {
                     <div
                         class="relative bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 p-6"
                     >
-                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <h3
+                            class="text-lg font-semibold mb-4 flex items-center gap-2"
+                        >
                             <PencilIcon class="h-5 w-5 text-gray-600" />
                             <span>Editar publicação</span>
                         </h3>
@@ -423,7 +442,12 @@ export default {
                                     v-model="editPost.title"
                                     class="mt-1 block w-full border rounded px-3 py-2"
                                 />
-                                <div v-if="editErrors.title" class="text-red-600 text-sm mt-1">{{ editErrors.title[0] }}</div>
+                                <div
+                                    v-if="editErrors.title"
+                                    class="text-red-600 text-sm mt-1"
+                                >
+                                    {{ editErrors.title[0] }}
+                                </div>
                             </div>
                             <div>
                                 <label
@@ -434,7 +458,12 @@ export default {
                                     v-model="editPost.content"
                                     placeholder="Conteúdo da publicação"
                                 />
-                                <div v-if="editErrors.content" class="text-red-600 text-sm mt-1">{{ editErrors.content[0] }}</div>
+                                <div
+                                    v-if="editErrors.content"
+                                    class="text-red-600 text-sm mt-1"
+                                >
+                                    {{ editErrors.content[0] }}
+                                </div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <label class="flex items-center gap-2"
@@ -461,7 +490,9 @@ export default {
                                 Salvar
                             </button>
                         </div>
-                        <div v-if="editError" class="text-red-600 text-sm mt-2">{{ editError }}</div>
+                        <div v-if="editError" class="text-red-600 text-sm mt-2">
+                            {{ editError }}
+                        </div>
                     </div>
                 </div>
 
@@ -478,8 +509,15 @@ export default {
                     <div class="flex items-start gap-3">
                         <TrashIcon class="h-6 w-6 text-red-600 mt-0.5" />
                         <div>
-                            <div>Tem certeza que deseja apagar esta publicação?</div>
-                            <div v-if="deleteError" class="text-red-600 text-sm mt-2">{{ deleteError }}</div>
+                            <div>
+                                Tem certeza que deseja apagar esta publicação?
+                            </div>
+                            <div
+                                v-if="deleteError"
+                                class="text-red-600 text-sm mt-2"
+                            >
+                                {{ deleteError }}
+                            </div>
                         </div>
                     </div>
                 </Modal>
@@ -556,8 +594,8 @@ export default {
         <div class="mt-8 text-sm text-green-600">
             Receba por email as mais importantes Notícias de CRM do mundo!
         </div>
-    
-    <InlineToast :message="toastMessage" :visible="showToast" />
+
+        <InlineToast :message="toastMessage" :visible="showToast" />
     </div>
 </template>
 

@@ -75,7 +75,8 @@ export default {
                 });
                 if (!res.ok) {
                     const data = await res.json().catch(() => ({}));
-                    this.deleteError = data.message || "Erro ao apagar publicação";
+                    this.deleteError =
+                        data.message || "Erro ao apagar publicação";
                     return;
                 }
                 this.$emit("deleted", this.post);
@@ -106,10 +107,12 @@ export default {
         share() {
             try {
                 const url = `${window.location.origin}/content/${this.post.id}`;
-                if (navigator.share) navigator.share({ title: this.post.title, url });
+                if (navigator.share)
+                    navigator.share({ title: this.post.title, url });
                 else {
                     navigator.clipboard.writeText(url);
-                    this.toastMessage = "Link copiado para a área de transferência";
+                    this.toastMessage =
+                        "Link copiado para a área de transferência";
                     this.showToast = true;
                     setTimeout(() => (this.showToast = false), 2500);
                 }
@@ -171,23 +174,42 @@ export default {
                         {{ tabcoinsLabel }}
                     </span>
                     <span v-if="showComments">·</span>
-                    <span v-if="showComments" class="comments">{{ commentsLabel }}</span>
+                    <span v-if="showComments" class="comments">{{
+                        commentsLabel
+                    }}</span>
                     <span v-if="showComments">·</span>
-                    <span v-if="post.author" class="author">{{ post.author }}</span>
+                    <span v-if="post.author" class="author">{{
+                        post.author
+                    }}</span>
                     <span>·</span>
                     <span class="time">{{ formattedDate }}</span>
                 </div>
 
                 <div class="actions flex items-center gap-3">
-
                     <div v-if="isAuthor" class="ml-auto flex gap-2 text-sm">
                         <button
                             @click="$emit('edit', post)"
                             class="text-gray-600 hover:underline flex items-center gap-1"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a1.875 1.875 0 012.651 2.651L8.454 16.197a1.875 1.875 0 01-.79.48L4 18l1.323-3.664a1.875 1.875 0 01.48-.79L16.862 3.487z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.5l-2.5-2.5" />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-gray-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M16.862 3.487a1.875 1.875 0 012.651 2.651L8.454 16.197a1.875 1.875 0 01-.79.48L4 18l1.323-3.664a1.875 1.875 0 01.48-.79L16.862 3.487z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M19.5 7.5l-2.5-2.5"
+                                />
                             </svg>
                             <span>Editar</span>
                         </button>
@@ -195,14 +217,35 @@ export default {
                             @click="confirmDelete"
                             class="text-red-600 hover:underline flex items-center gap-1"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2" />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-red-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M3 6h18"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6M10 6V4a2 2 0 012-2h0a2 2 0 012 2v2"
+                                />
                             </svg>
                             <span>Excluir</span>
                         </button>
                     </div>
-                    <div v-if="actionError" class="ml-auto text-red-600 text-sm">{{ actionError }}</div>
+                    <div
+                        v-if="actionError"
+                        class="ml-auto text-red-600 text-sm"
+                    >
+                        {{ actionError }}
+                    </div>
                     <Modal
                         :visible="showDeleteModal"
                         title="Apagar publicação"
@@ -213,7 +256,12 @@ export default {
                         cancelText="Cancelar"
                     >
                         <div>Tem certeza que deseja excluir este post?</div>
-                        <div v-if="deleteError" class="text-red-600 text-sm mt-2">{{ deleteError }}</div>
+                        <div
+                            v-if="deleteError"
+                            class="text-red-600 text-sm mt-2"
+                        >
+                            {{ deleteError }}
+                        </div>
                     </Modal>
                     <InlineToast :message="toastMessage" :visible="showToast" />
                 </div>

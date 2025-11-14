@@ -19,10 +19,14 @@
 
                     <!-- Conteúdo do comentário -->
                     <!-- Rodapé com tabcoins, autor e tempo (comentários removidos conforme solicitado) -->
-                    <div class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap">
+                    <div
+                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap"
+                    >
                         <span>{{ item.tabcoins }} tabcoin</span>
                         <span>·</span>
-                        <span v-if="authorLabel(item)">{{ authorLabel(item) }}</span>
+                        <span v-if="authorLabel(item)">{{
+                            authorLabel(item)
+                        }}</span>
                         <span v-if="authorLabel(item)">·</span>
                         <span>{{ item.time }}</span>
                     </div>
@@ -50,7 +54,9 @@
                         <!-- menu moved to Content page (three-dots now shown in content view) -->
                     </div>
 
-                    <div class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
+                    <div
+                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap"
+                    >
                         <span>{{ tabcoinsLabel(post) }}</span>
                         <span>·</span>
                         <span>{{ authorLabel(post) }}</span>
