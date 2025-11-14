@@ -4,6 +4,7 @@ import Modal from "../components/Modal.vue";
 import InlineToast from "../components/InlineToast.vue";
 import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { usePostsStore } from "../stores/posts";
+import { useAuthStore } from "../stores/auth";
 
 export default {
     props: {
@@ -46,6 +47,28 @@ export default {
         formattedDate() {
             if (!this.localPost || !this.localPost.created_at) return "";
             return new Date(this.localPost.created_at).toLocaleString();
+        },
+        isAuthor() {
+            try {
+                const auth = useAuthStore();
+                if (!auth || !auth.user || !this.localPost) return false;
+                // prefer id-based check
+                if (
+                    typeof this.localPost.user_id !== "undefined" &&
+                    this.localPost.user_id !== null
+                ) {
+                    return auth.user.id === this.localPost.user_id;
+                }
+                const userName = (auth.user.name || "")
+                    .toString()
+                    .toLowerCase();
+                const authorName = (this.localPost.author || "")
+                    .toString()
+                    .toLowerCase();
+                return userName && authorName && userName === authorName;
+            } catch (e) {
+                return false;
+            }
         },
     },
     methods: {
@@ -262,22 +285,19 @@ export default {
             if (!this.localPost || !this.localPost.id) return;
             this.deleteLoading = true;
             try {
-                const token = localStorage.getItem("token");
-                const res = await fetch(`/api/posts/${this.localPost.id}`, {
-                    method: "DELETE",
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
-                });
-                if (!res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    this.deleteError =
-                        data.message || "Erro ao apagar publicação";
-                    return;
-                }
-                // redirect to publications
+                const postsStore = usePostsStore();
+                await postsStore.deletePost(this.localPost.id);
+                // redirect to publications after successful deletion
                 window.location.href = "/publications";
             } catch (e) {
                 console.error("Erro ao apagar", e);
-                this.deleteError = "Erro de rede ao apagar publicação.";
+                // try to extract message from response-like error
+                this.deleteError =
+                    (e &&
+                        e.response &&
+                        e.response.data &&
+                        e.response.data.message) ||
+                    "Erro ao apagar publicação";
             } finally {
                 this.deleteLoading = false;
                 this.showDeleteModal = false;
@@ -360,6 +380,7 @@ export default {
 
                     <div class="relative">
                         <button
+                            v-if="isAuthor"
                             @click.stop="toggleMenu"
                             class="p-1 rounded hover:bg-gray-100"
                         >

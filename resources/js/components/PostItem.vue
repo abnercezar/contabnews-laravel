@@ -1,6 +1,8 @@
 <script>
 import Modal from "./Modal.vue";
 import InlineToast from "./InlineToast.vue";
+import { useAuthStore } from "../stores/auth";
+import { usePostsStore } from "../stores/posts";
 
 export default {
     name: "PostItem",
@@ -14,10 +16,25 @@ export default {
     },
     computed: {
         isAuthor() {
-            if (!this.currentUser || !this.post) return false;
-            const a1 = (this.currentUser.name || "").toLowerCase();
-            const a2 = (this.post.author || "").toLowerCase();
-            return a1 && a1 === a2;
+            if (!this.post) return false;
+            // prefer prop currentUser, fallback to auth store
+            try {
+                const user = this.currentUser || useAuthStore().user || null;
+                if (!user) return false;
+                // prefer id check when post provides user_id
+                if (
+                    typeof this.post.user_id !== "undefined" &&
+                    this.post.user_id !== null
+                ) {
+                    return user.id === this.post.user_id;
+                }
+                if (!user.name) return false;
+                const a1 = (user.name || "").toString().toLowerCase();
+                const a2 = (this.post.author || "").toString().toLowerCase();
+                return a1 && a2 && a1 === a2;
+            } catch (e) {
+                return false;
+            }
         },
         tabcoinsLabel() {
             const n = this.post.tabcoins ?? 0;
@@ -66,24 +83,18 @@ export default {
             if (!this.post || !this.post.id) return;
             this.deleteLoading = true;
             try {
-                const token = localStorage.getItem("token");
-                const headers = { Accept: "application/json" };
-                if (token) headers.Authorization = `Bearer ${token}`;
-                const res = await fetch(`/api/posts/${this.post.id}`, {
-                    method: "DELETE",
-                    headers,
-                });
-                if (!res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    this.deleteError =
-                        data.message || "Erro ao apagar publicação";
-                    return;
-                }
+                const postsStore = usePostsStore();
+                await postsStore.deletePost(this.post.id);
                 this.$emit("deleted", this.post);
                 this.showDeleteModal = false;
             } catch (err) {
                 console.error(err);
-                this.deleteError = "Erro de rede ao apagar publicação.";
+                this.deleteError =
+                    (err &&
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.message) ||
+                    "Erro ao apagar publicação.";
             } finally {
                 this.deleteLoading = false;
             }

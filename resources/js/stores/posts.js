@@ -56,6 +56,25 @@ export const usePostsStore = defineStore("posts", {
                 this.loading = false;
             }
         },
+        async deletePost(id) {
+            if (!id) return false;
+            try {
+                const token = localStorage.getItem("token");
+                const headers = token
+                    ? { Authorization: `Bearer ${token}` }
+                    : {};
+                // use axios to leverage baseURL and interceptors
+                const res = await axios.delete(`/api/posts/${id}`, {
+                    headers,
+                });
+                // remove from local state
+                this.posts = this.posts.filter((p) => p.id !== id);
+                return res;
+            } catch (e) {
+                // rethrow so caller can handle
+                throw e;
+            }
+        },
         addPost(post) {
             if (!post) return;
             // normalize incoming post

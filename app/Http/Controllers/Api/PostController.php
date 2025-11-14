@@ -19,15 +19,14 @@ class PostController extends Controller
         $validated = $request->validated();
         $user = $request->user();
         $validated['author'] = $user ? $user->name : 'Anônimo';
+        if ($user) $validated['user_id'] = $user->id;
         $post = Post::create($validated);
         return response()->json($post, 201);
     }
 
     public function update(UpdatePostRequest $request, Post $post)
     {
-        if ($post->author !== $request->user()->name) {
-            return response()->json(['error' => 'Acesso negado'], 403);
-        }
+        $this->authorize('update', $post);
         $validated = $request->validated();
         $post->update($validated);
         return response()->json($post);
@@ -35,9 +34,7 @@ class PostController extends Controller
 
     public function destroy(Request $request, Post $post)
     {
-        if ($post->author !== $request->user()->name) {
-            return response()->json(['error' => 'Acesso negado'], 403);
-        }
+        $this->authorize('delete', $post);
         $post->delete();
         return response()->json(null, 204);
     }

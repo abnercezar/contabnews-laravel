@@ -12,6 +12,7 @@ class Post extends Model
     //
     protected $fillable = [
         'title',
+        'user_id',
         'coin',
         'comments',
         'author',
@@ -48,6 +49,14 @@ class Post extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Autor (user) do post
+     */
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     /**

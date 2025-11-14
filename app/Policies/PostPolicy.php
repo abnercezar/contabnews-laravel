@@ -4,9 +4,12 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy
 {
+    use HandlesAuthorization;
+
     /**
      * Determine whether the user can create posts.
      */
@@ -21,6 +24,10 @@ class PostPolicy
     public function update(?User $user, Post $post): bool
     {
         if (!$user) return false;
+        // prefer id-based check when available
+        if ($post->user_id) {
+            return $user->id === $post->user_id;
+        }
         return $post->author === $user->name;
     }
 
@@ -30,6 +37,9 @@ class PostPolicy
     public function delete(?User $user, Post $post): bool
     {
         if (!$user) return false;
+        if ($post->user_id) {
+            return $user->id === $post->user_id;
+        }
         return $post->author === $user->name;
     }
 
