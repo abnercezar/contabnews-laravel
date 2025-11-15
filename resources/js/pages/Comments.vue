@@ -2,7 +2,6 @@
 import StandardLayout from "../components/StandardLayout.vue";
 import Modal from "../components/Modal.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
-import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import { useCommentsStore } from "../stores/comments";
 import { useAuthStore } from "../stores/auth";
 import { onMounted } from "vue";
@@ -13,8 +12,6 @@ export default {
         StandardLayout,
         Modal,
         MarkdownEditor,
-        PencilIcon,
-        TrashIcon,
     },
     setup() {
         const commentsStore = useCommentsStore();
@@ -42,12 +39,21 @@ export default {
             commentDeleteTarget: null,
             commentDeleteLoading: false,
             commentDeleteError: "",
+            // controle de qual comentário tem o menu aberto (id)
+            showMenuFor: null,
+            // (inline expansion/inline reply removed)
         };
     },
     computed: {
         comments() {
             return this.commentsStore.comments || [];
         },
+    },
+    mounted() {
+        document.addEventListener("click", this.handleDocClick);
+    },
+    beforeUnmount() {
+        document.removeEventListener("click", this.handleDocClick);
     },
     methods: {
         openPostItem(item) {
@@ -63,10 +69,25 @@ export default {
         },
 
         openComment(comment) {
-            // If comment references a post id, go to that post. Otherwise try the parent post in this page, then fallback to comment.url
+            console.log("[Comments] openComment", comment);
+            // Ao clicar no comentário, abre a página do post com âncora no comentário
+            // Tenta derivar o postId a partir de várias formas que o objeto
+            // comentário pode vir (post_id, postId, comment.post.id, raw.post_id).
+            // Se nenhum for encontrado, não forçamos o fallback para `this.post.id`
+            // para evitar abrir o post errado.
             const postId =
-                comment?.post_id ?? comment?.postId ?? this.post?.id ?? null;
-            const url = postId ? `/content/${postId}` : comment?.url ?? "#";
+                comment?.post_id ??
+                comment?.postId ??
+                comment?.post?.id ??
+                comment?.raw?.post_id ??
+                null;
+
+            // Se tivermos um postId válido, navegamos para o post com âncora.
+            // Caso contrário, use um URL direto do comentário (se existir),
+            // ou simplesmente mantenha '#'.
+            const url = postId
+                ? `/content/${postId}#comment-${comment?.id}`
+                : comment?.url ?? "#";
             try {
                 if (this.$inertia && typeof this.$inertia.visit === "function")
                     this.$inertia.visit(url);
@@ -75,6 +96,37 @@ export default {
                 window.location.href = url;
             }
         },
+
+        // abre o menu de ações (Responder / Editar / Apagar) para um comentário
+        toggleMenu(commentId, ev) {
+            if (ev && typeof ev.stopPropagation === "function")
+                ev.stopPropagation();
+            this.showMenuFor =
+                this.showMenuFor === commentId ? null : commentId;
+        },
+
+        handleDocClick() {
+            this.showMenuFor = null;
+        },
+
+        // ação de responder: redireciona para a página do post e anexa a âncora do comentário
+        replyToComment(comment) {
+            // manter comportamento de navegação para abrir editor na página do post
+            const postId =
+                comment?.post_id ?? comment?.postId ?? this.post?.id ?? null;
+            const url = postId
+                ? `/content/${postId}?replyTo=${comment?.id}#comment-${comment?.id}`
+                : comment?.url ?? "#";
+            try {
+                if (this.$inertia && typeof this.$inertia.visit === "function")
+                    this.$inertia.visit(url);
+                else window.location.href = url;
+            } catch (e) {
+                window.location.href = url;
+            }
+        },
+
+        // inline reply removed; use post page to reply
 
         isCommentAuthor(comment) {
             try {
@@ -166,6 +218,16 @@ export default {
             this.commentDeleteLoading = false;
         },
 
+        openEditFromMenu(comment) {
+            this.showMenuFor = null;
+            this.openEditComment(comment);
+        },
+
+        deleteFromMenu(comment) {
+            this.showMenuFor = null;
+            this.confirmCommentDelete(comment);
+        },
+
         async deleteComment() {
             if (!this.commentDeleteTarget || !this.commentDeleteTarget.id)
                 return;
@@ -202,6 +264,32 @@ export default {
                 this.commentDeleteLoading = false;
             }
         },
+
+        shareComment(comment) {
+            try {
+                const postId = comment?.post_id ?? this.post?.id ?? null;
+                const url = postId
+                    ? window.location.origin +
+                      `/content/${postId}#comment-${comment.id}`
+                    : comment?.url ?? window.location.href;
+                if (navigator.share)
+                    navigator.share({
+                        title: this.post?.title || "Comentário",
+                        url,
+                    });
+                else {
+                    navigator.clipboard.writeText(url);
+                    try {
+                        // rápido feedback
+                        alert("Link do comentário copiado");
+                    } catch (e) {}
+                }
+            } catch (e) {
+                try {
+                    navigator.clipboard.writeText(window.location.href);
+                } catch (e) {}
+            }
+        },
     },
 };
 </script>
@@ -218,130 +306,165 @@ export default {
                 >
                     {{ post.title }}
                 </a>
+
                 <p class="text-gray-500 text-xs mt-1">
                     Contribuindo com
-                    <span class="text-black font-medium">{{
-                        post.author
-                    }}</span>
+                    <span class="text-black font-medium">
+                        {{ post.author }}
+                    </span>
                 </p>
             </div>
 
-            <!-- Lista de comentários -->
+            <!-- LISTA DE COMENTÁRIOS -->
             <div class="flex flex-col gap-5">
                 <a
                     v-for="(comment, index) in comments"
-                    :key="index"
+                    :key="comment.id"
                     href="#"
                     @click.prevent="openComment(comment)"
-                    class="block border-b border-gray-100 pb-4 rounded-md px-2 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                    class="block border-b border-gray-200 pb-4 rounded-md px-2 hover:bg-gray-50 transition-all duration-150 cursor-pointer group"
                 >
                     <p
-                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700 group-hover:underline"
+                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
                     >
                         {{ comment.body }}
                     </p>
-
-                    <div
-                        class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2"
-                    >
-                        <span>
-                            {{ comment.tabcoins }}
-                            {{ comment.tabcoins > 1 ? "tabcoins" : "tabcoin" }}
-                        </span>
-                        <span>·</span>
-                        <span>
-                            {{ comment.replies }}
-                            {{
-                                comment.replies === 1
-                                    ? "comentário"
-                                    : "comentários"
-                            }}
-                        </span>
-                        <span>·</span>
-                        <span class="font-medium text-gray-700">{{
-                            comment.username
-                        }}</span>
-                        <span>·</span>
-                        <span>{{ comment.created_at }}</span>
-                        <span class="ml-2"> </span>
-                        <span class="ml-auto flex items-center gap-2">
-                            <button
-                                @click.stop.prevent="shareComment(comment)"
-                                class="p-1 rounded hover:bg-gray-100"
-                            >
-                                🔗
-                            </button>
-                            <button
-                                v-if="isCommentAuthor(comment)"
-                                @click.stop.prevent="openEditComment(comment)"
-                                class="p-1 rounded hover:bg-gray-100"
-                            >
-                                <PencilIcon class="h-4 w-4 text-gray-600" />
-                            </button>
-                            <button
-                                v-if="isCommentAuthor(comment)"
-                                @click.stop.prevent="
-                                    confirmCommentDelete(comment)
-                                "
-                                class="p-1 rounded hover:bg-gray-100"
-                            >
-                                <TrashIcon class="h-4 w-4 text-red-600" />
-                            </button>
-                        </span>
-                    </div>
                 </a>
             </div>
 
-            <!-- Edit comment modal -->
-            <div
-                v-if="showCommentEditModal"
-                class="fixed inset-0 z-50 flex items-center justify-center"
-            >
+            <!-- MODAL DO COMENTÁRIO EXPANDIDO -->
+            <transition name="fade">
                 <div
-                    class="absolute inset-0 bg-black opacity-50"
-                    @click="showCommentEditModal = false"
-                ></div>
-                <div
-                    class="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6"
+                    v-if="expandedComment"
+                    class="fixed inset-0 z-40 flex items-center justify-center"
                 >
-                    <h3
-                        class="text-lg font-semibold mb-3 flex items-center gap-2"
-                    >
-                        <PencilIcon class="h-5 w-5 text-gray-600" />Editar
-                        comentário
-                    </h3>
-                    <MarkdownEditor v-model="commentEdit.body" />
                     <div
-                        v-if="commentEditErrors.body"
-                        class="text-red-600 text-sm mt-2"
-                    >
-                        {{ commentEditErrors.body[0] }}
-                    </div>
-                    <div class="mt-4 flex justify-end gap-2">
-                        <button
-                            @click="showCommentEditModal = false"
-                            class="px-3 py-1 bg-gray-100 rounded"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            @click="submitCommentEdit"
-                            :disabled="commentDeleteLoading"
-                            class="px-4 py-2 bg-[#d3ad71] text-white rounded"
-                        >
-                            Salvar
-                        </button>
-                    </div>
+                        class="absolute inset-0 bg-black/40"
+                        @click="expandedComment = null"
+                    ></div>
+
                     <div
-                        v-if="commentEditError"
-                        class="text-red-600 text-sm mt-2"
+                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
                     >
-                        {{ commentEditError }}
+                        <!-- Header do comentário -->
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-sm text-gray-700 font-medium">
+                                    {{
+                                        expandedComment.user?.name || "Anônimo"
+                                    }}
+                                </div>
+
+                                <div class="text-xs text-gray-500">
+                                    {{ formatDate(expandedComment.created_at) }}
+                                </div>
+                            </div>
+
+                            <button
+                                @click="expandedComment = null"
+                                class="text-gray-500"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <!-- Corpo do comentário -->
+                        <div class="mt-4 text-gray-800 whitespace-pre-wrap">
+                            {{ expandedComment.body }}
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="mt-4 flex justify-end gap-2">
+                            <button
+                                v-if="isCommentAuthor(expandedComment)"
+                                @click="openEditFromMenu(expandedComment)"
+                                class="px-3 py-1 bg-gray-100 rounded"
+                            >
+                                Editar
+                            </button>
+
+                            <button
+                                v-if="isCommentAuthor(expandedComment)"
+                                @click="deleteFromMenu(expandedComment)"
+                                class="px-3 py-1 bg-red-600 text-white rounded"
+                            >
+                                Apagar
+                            </button>
+
+                            <button
+                                @click="shareComment(expandedComment)"
+                                class="px-3 py-1 bg-white border rounded"
+                            >
+                                Compartilhar
+                            </button>
+
+                            <button
+                                @click="replyToComment(expandedComment)"
+                                class="px-3 py-1 bg-[#d3ad71] text-white rounded"
+                            >
+                                Responder
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </transition>
 
-            <!-- Delete comment modal -->
+            <!-- MODAL DE EDIÇÃO -->
+            <transition name="fade">
+                <div
+                    v-if="showCommentEditModal"
+                    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+                >
+                    <div
+                        class="absolute inset-0 bg-black/40"
+                        @click="showCommentEditModal = false"
+                    ></div>
+
+                    <div
+                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
+                    >
+                        <h3
+                            class="text-lg font-semibold mb-4 flex items-center gap-2"
+                        >
+                            ✏️ Editar comentário
+                        </h3>
+
+                        <MarkdownEditor v-model="commentEdit.body" />
+
+                        <div
+                            v-if="commentEditErrors.body"
+                            class="text-red-600 text-sm mt-2"
+                        >
+                            {{ commentEditErrors.body[0] }}
+                        </div>
+
+                        <div class="mt-4 flex justify-end gap-2">
+                            <button
+                                @click="showCommentEditModal = false"
+                                class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                @click="submitCommentEdit"
+                                class="px-4 py-2 bg-[#d3ad71] text-white rounded hover:bg-[#c19a5f] transition"
+                            >
+                                Salvar
+                            </button>
+                        </div>
+
+                        <div
+                            v-if="commentEditError"
+                            class="text-red-600 text-sm mt-3"
+                        >
+                            {{ commentEditError }}
+                        </div>
+                    </div>
+                </div>
+            </transition>
+
+            <!-- MODAL DE EXCLUSÃO -->
             <Modal
                 :visible="showCommentDeleteModal"
                 title="Apagar comentário"
@@ -352,11 +475,13 @@ export default {
                 cancelText="Cancelar"
             >
                 <div class="flex items-start gap-3">
-                    <TrashIcon class="h-6 w-6 text-red-600 mt-0.5" />
+                    <span class="text-red-600 text-xl">🗑️</span>
+
                     <div>
-                        <div>
+                        <div class="font-medium">
                             Tem certeza que deseja apagar este comentário?
                         </div>
+
                         <div
                             v-if="commentDeleteError"
                             class="text-red-600 text-sm mt-2"
@@ -369,3 +494,43 @@ export default {
         </div>
     </StandardLayout>
 </template>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-scale-enter-active {
+    transition: all 0.15s ease;
+}
+.fade-scale-enter-from {
+    opacity: 0;
+    transform: scale(0.95);
+}
+.fade-scale-leave-active {
+    transition: all 0.12s ease;
+}
+.fade-scale-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.animate-pop {
+    animation: pop 0.18s ease-out;
+}
+@keyframes pop {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+</style>

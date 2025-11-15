@@ -32,11 +32,96 @@ export default {
             toastMessage: "",
             showToast: false,
             localPost: null,
+            // comentário atualmente em destaque (quando a URL aponta para um comentário)
+            activeComment: null,
         };
     },
     created() {
         // cria uma cópia local reativa do post para evitar mutações diretas na prop
         this.localPost = this.post ? JSON.parse(JSON.stringify(this.post)) : {};
+
+        // Se a URL tiver query ?replyTo=ID ou ?openComment=ID, abre o editor de resposta automaticamente
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const replyTo = params.get("replyTo") || params.get("openComment");
+            if (replyTo) {
+                // tenta encontrar o comentário localmente para preencher quote
+                const cid = replyTo;
+                let commentObj = null;
+                if (this.localPost && Array.isArray(this.localPost.comments)) {
+                    commentObj = this.localPost.comments.find(
+                        (c) => String(c.id) === String(cid)
+                    );
+                }
+                if (commentObj) {
+                    const author = commentObj.user
+                        ? commentObj.user.name
+                        : "Anônimo";
+                    const snippet = commentObj.body
+                        ? commentObj.body.slice(0, 200)
+                        : "";
+                    this.replyBody = `> ${author}: ${snippet}\n\n`;
+                }
+                this.replyingToCommentId = cid;
+                this.showReply = true;
+                this.$nextTick(() => {
+                    const editor = this.$refs.mdEditor;
+                    if (editor && editor.$el) {
+                        const ta = editor.$el.querySelector("textarea");
+                        if (ta) ta.focus();
+                    } else {
+                        const ta = this.$el.querySelector("textarea");
+                        if (ta) ta.focus();
+                    }
+                });
+            }
+        } catch (e) {}
+
+        // Se a hash da URL for #comment-{id}, tenta carregar esse comentário para destacar
+        try {
+            const hash = window.location.hash || "";
+            const m = hash.match(/#comment-(\d+)/);
+            const cid = m ? m[1] : null;
+            if (cid) {
+                // se já temos o comentário nos dados locais, use-o; caso contrário, busque via API
+                let commentObj = null;
+                if (this.localPost && Array.isArray(this.localPost.comments)) {
+                    commentObj = this.localPost.comments.find(
+                        (c) => String(c.id) === String(cid)
+                    );
+                }
+                if (commentObj) {
+                    this.activeComment = commentObj;
+                    // scroll suave até o comentário
+                    this.$nextTick(() => {
+                        const el = document.getElementById("comment-" + cid);
+                        if (el)
+                            el.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                            });
+                    });
+                } else {
+                    this.fetchComment(cid)
+                        .then((c) => {
+                            if (c) {
+                                this.activeComment = c;
+                                this.$nextTick(() => {
+                                    const el = document.getElementById(
+                                        "comment-" + cid
+                                    );
+                                    if (el)
+                                        el.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "center",
+                                        });
+                                });
+                            }
+                        })
+                        .catch(() => {});
+                }
+            }
+        } catch (e) {}
     },
     watch: {
         post(newVal) {
@@ -211,6 +296,22 @@ export default {
                     setTimeout(() => (this.showToast = false), 2500);
                 } catch (e) {}
             }
+        },
+
+        async fetchComment(id) {
+            if (!id) return null;
+            try {
+                const res = await fetch(`/api/comments/${id}`);
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data;
+            } catch (e) {
+                return null;
+            }
+        },
+        commentAnchorUrl(comment) {
+            if (!comment || !comment.id) return "/comments";
+            return `/comments?openComment=${comment.id}#comment-${comment.id}`;
         },
         // three-dots menu handlers
         toggleMenu() {
@@ -420,6 +521,8 @@ export default {
                         </div>
                     </div>
                 </div>
+
+                <!-- Comentário em destaque quando há hash ? -->
 
                 <div
                     class="mb-6 text-base leading-relaxed text-gray-800"

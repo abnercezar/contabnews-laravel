@@ -31,4 +31,37 @@ class CommentController extends Controller
 
         return response()->json($comment, 201);
     }
+
+    public function update(Request $request, Comment $comment)
+    {
+        $user = $request->user();
+
+        if ($user->id !== $comment->user_id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $data = $request->validate([
+            'body' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $comment->body = $data['body'];
+        $comment->save();
+
+        $comment->load('user');
+
+        return response()->json($comment, 200);
+    }
+
+    public function destroy(Request $request, Comment $comment)
+    {
+        $user = $request->user();
+
+        if ($user->id !== $comment->user_id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(null, 204);
+    }
 }

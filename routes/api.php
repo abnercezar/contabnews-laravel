@@ -31,4 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('posts/{post}/reactions', [\App\Http\Controllers\ReactionController::class, 'toggle']);
     // comentários
     Route::post('comments', [\App\Http\Controllers\Api\CommentController::class, 'store']);
+    Route::put('comments/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'update']);
+    Route::delete('comments/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'destroy']);
 });
