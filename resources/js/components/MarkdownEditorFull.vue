@@ -36,7 +36,79 @@
 </template>
 
 <script>
-import { marked } from "marked";
+// lightweight renderer reused from MarkdownRenderer (no external deps)
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function renderMarkdownSimple(md) {
+    if (!md) return "";
+    const codeBlocks = [];
+    md = md.replace(/```([\s\S]*?)```/g, function (_, code) {
+        const idx = codeBlocks.push(code) - 1;
+        return `@@CODEBLOCK${idx}@@`;
+    });
+    const inlineCodes = [];
+    md = md.replace(/`([^`]+)`/g, function (_, code) {
+        const idx = inlineCodes.push(code) - 1;
+        return `@@INLINECODE${idx}@@`;
+    });
+    md = escapeHtml(md);
+    md = md.replace(/^######\s*(.*)$/gm, "<h6>$1</h6>");
+    md = md.replace(/^#####\s*(.*)$/gm, "<h5>$1</h5>");
+    md = md.replace(/^####\s*(.*)$/gm, "<h4>$1</h4>");
+    md = md.replace(/^###\s*(.*)$/gm, "<h3>$1</h3>");
+    md = md.replace(/^##\s*(.*)$/gm, "<h2>$1</h2>");
+    md = md.replace(/^#\s*(.*)$/gm, "<h1>$1</h1>");
+    md = md.replace(/^>\s?(.*)$/gm, "<blockquote>$1</blockquote>");
+    md = md.replace(/^(?:\s*[-*]\s+)(.*)$/gm, "<li>$1</li>");
+    md = md.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, function (grp) {
+        if (/^\s*<ul>/.test(grp) || /^\s*<ol>/.test(grp)) return grp;
+        return `<ul>${grp}</ul>`;
+    });
+    md = md.replace(/^\s*\d+\.\s+(.*)$/gm, "<li>$1</li>");
+    md = md.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, function (grp) {
+        if (/^\s*<li>\d+/m.test(grp)) return `<ol>${grp}</ol>`;
+        return grp;
+    });
+    md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, text, url) {
+        const safe = /^\s*javascript:/i.test(url) ? "#" : url;
+        return `<a href="${safe}">${text}</a>`;
+    });
+    const parts = md.split(/\n{2,}/g);
+    const processed = parts
+        .map((p) => {
+            p = p.trim();
+            if (!p) return "";
+            if (
+                /^<h\d+>/.test(p) ||
+                /^<ul>/.test(p) ||
+                /^<ol>/.test(p) ||
+                /^<blockquote>/.test(p) ||
+                /^@@CODEBLOCK\d+@@/.test(p) ||
+                /^<pre>/.test(p)
+            )
+                return p;
+            return `<p>${p.replace(/\n/g, "<br />")}</p>`;
+        })
+        .join("\n");
+    let result = processed;
+    result = result.replace(/@@INLINECODE(\d+)@@/g, function (_, i) {
+        const c = inlineCodes[Number(i)] || "";
+        return `<code>${escapeHtml(c)}</code>`;
+    });
+    result = result.replace(/@@CODEBLOCK(\d+)@@/g, function (_, i) {
+        const c = codeBlocks[Number(i)] || "";
+        return `<pre><code>${escapeHtml(c)}</code></pre>`;
+    });
+    return result;
+}
+
 export default {
     name: "MarkdownEditorFull",
     props: {
@@ -65,7 +137,7 @@ export default {
     },
     computed: {
         rendered() {
-            return marked.parse(this.input || "");
+            return renderMarkdownSimple(this.input || "");
         },
     },
     methods: {
@@ -111,31 +183,47 @@ button:hover {
     background: #e5e7eb;
 }
 .markdown-body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial;
     font-size: 1rem;
     line-height: 1.7;
-    color: #222;
+    color: #111827;
 }
-.markdown-body h1,
-.markdown-body h2,
+.markdown-body h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0.67em 0;
+}
+.markdown-body h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.75em 0;
+}
 .markdown-body h3 {
-    font-weight: bold;
-    margin-top: 1em;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0.75em 0;
 }
 .markdown-body code {
     background: #f3f4f6;
     border-radius: 4px;
     padding: 2px 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+        "Courier New", monospace;
 }
 .markdown-body pre {
     background: #f3f4f6;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 8px;
     overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+        "Courier New", monospace;
 }
 .markdown-body blockquote {
     border-left: 4px solid #374151;
     padding-left: 1em;
-    color: #555;
+    color: #374151;
+    background: #f8fafc;
     margin: 1em 0;
 }
 </style>

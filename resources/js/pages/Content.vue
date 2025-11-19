@@ -1,5 +1,6 @@
 <script>
 import MarkdownEditor from "../components/MarkdownEditor.vue";
+import MarkdownRenderer from "../components/MarkdownRenderer.vue";
 import Modal from "../components/Modal.vue";
 import InlineToast from "../components/InlineToast.vue";
 import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
@@ -10,7 +11,14 @@ export default {
     props: {
         post: Object,
     },
-    components: { MarkdownEditor, Modal, InlineToast, PencilIcon, TrashIcon },
+    components: {
+        MarkdownEditor,
+        MarkdownRenderer,
+        Modal,
+        InlineToast,
+        PencilIcon,
+        TrashIcon,
+    },
     data() {
         return {
             showReply: false,
@@ -524,15 +532,8 @@ export default {
 
                 <!-- Comentário em destaque quando há hash ? -->
 
-                <div
-                    class="mb-6 text-base leading-relaxed text-gray-800"
-                    style="
-                        white-space: pre-wrap;
-                        font-family: ui-sans-serif, system-ui, -apple-system,
-                            'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-                    "
-                >
-                    {{ localPost.content }}
+                <div class="mb-6 text-base leading-relaxed text-gray-800">
+                    <MarkdownRenderer :source="localPost.content" />
                 </div>
 
                 <div v-if="localPost.source_url" class="mb-6 text-sm">

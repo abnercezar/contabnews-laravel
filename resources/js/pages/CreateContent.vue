@@ -1,11 +1,11 @@
 <script>
-import MarkdownEditor from "../components/MarkdownEditor.vue";
+import MarkdownEditorFull from "../components/MarkdownEditorFull.vue";
 import Modal from "../components/Modal.vue";
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
 import { usePostsStore } from "../stores/posts";
 export default {
     name: "CreateContent",
-    components: { MarkdownEditor, Modal },
+    components: { MarkdownEditorFull, Modal },
     data() {
         return {
             form: {
@@ -208,7 +208,7 @@ export default {
                             Corpo da publicação
                             <span class="text-red-500">*</span>
                         </label>
-                        <MarkdownEditor
+                        <MarkdownEditorFull
                             v-model="form.body"
                             placeholder="Digite o conteúdo..."
                         />
