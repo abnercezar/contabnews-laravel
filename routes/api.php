@@ -2,11 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ClassifiedController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserRegisterController;
 
 // Endpoints públicos
 Route::apiResource('posts', PostController::class, [
+    'only' => ['index', 'show']
+]);
+
+// Classifieds: endpoints públicos index/show
+Route::apiResource('classifieds', ClassifiedController::class, [
     'only' => ['index', 'show']
 ]);
 
@@ -33,4 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('comments', [\App\Http\Controllers\Api\CommentController::class, 'store']);
     Route::put('comments/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'update']);
     Route::delete('comments/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'destroy']);
+    // classificados (protegidos)
+    Route::post('classifieds', [\App\Http\Controllers\Api\ClassifiedController::class, 'store']);
+    Route::put('classifieds/{classified}', [\App\Http\Controllers\Api\ClassifiedController::class, 'update']);
+    Route::patch('classifieds/{classified}', [\App\Http\Controllers\Api\ClassifiedController::class, 'update']);
+    Route::delete('classifieds/{classified}', [\App\Http\Controllers\Api\ClassifiedController::class, 'destroy']);
 });
