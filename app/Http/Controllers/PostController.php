@@ -13,6 +13,7 @@ use App\Actions\UpdatePostAction;
 use App\Actions\DeletePostAction;
 use App\Models\Reaction;
 use Illuminate\Support\Facades\Redis;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class PostController extends Controller
 {
@@ -24,7 +25,29 @@ class PostController extends Controller
 
         // Option to request only the current user's posts: ?mine=1
         $mine = filter_var(request()->get('mine', false), FILTER_VALIDATE_BOOLEAN);
+
+        // tenta obter usuário autenticado da requisição.
+        // Observação: as rotas `index`/`show` dos posts são públicas (não usam
+        // middleware `auth:sanctum`). Se o cliente enviar um header
+        // `Authorization: Bearer <token>` com um Personal Access Token do
+        // Sanctum, o `request()->user()` estará nulo porque o middleware
+        // não foi executado. Nesse caso, tentamos resolver o token manualmente
+        // via `PersonalAccessToken::findToken` para popular `$user`.
         $user = request()->user();
+        if (! $user) {
+            $bearer = request()->bearerToken();
+            if ($bearer) {
+                try {
+                    $pat = PersonalAccessToken::findToken($bearer);
+                    if ($pat) {
+                        $user = $pat->tokenable; // normalmente o usuário
+                    }
+                } catch (\Exception $e) {
+                    // ignorar se não conseguir resolver o token
+                    $user = null;
+                }
+            }
+        }
 
         $cacheKey = "posts:page:{$page}:per:{$perPage}:mine:" . ($mine ? '1' : '0') . ($user ? ":user:{$user->id}" : ':guest');
 
