@@ -3,7 +3,11 @@
         <Header />
 
         <main class="flex-1">
-            <slot />
+            <div class="w-full max-w-4xl mx-auto px-4 py-8">
+                <div class="text-left">
+                    <slot />
+                </div>
+            </div>
         </main>
 
         <Footer />

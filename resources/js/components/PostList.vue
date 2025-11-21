@@ -1,11 +1,11 @@
 <template>
     <div :class="filter === 'Todos' ? 'text-center' : 'text-left'">
         <!-- Lista genérica: muda conforme a aba -->
-        <div v-if="filter === 'Todos'" class="space-y-6">
+        <div v-if="filter === 'Todos'" class="space-y-2">
             <div
                 v-for="(item, index) in itemsToRender"
                 :key="index"
-                class="border-b border-gray-200 pb-4"
+                class="pb-1"
             >
                 <div class="mx-auto max-w-2xl text-left">
                     <!-- Título (linkável) -->
@@ -35,12 +35,8 @@
         </div>
 
         <!-- Outras abas (ex: Publicações, Comentários, etc) -->
-        <div v-else class="space-y-4">
-            <div
-                v-for="(post, index) in posts"
-                :key="index"
-                class="pb-3 relative"
-            >
+        <div v-else class="space-y-1">
+            <div v-for="(post, index) in posts" :key="index" class="pb-1 relative">
                 <div class="mx-auto max-w-2xl text-left">
                     <div class="flex items-start justify-between">
                         <a

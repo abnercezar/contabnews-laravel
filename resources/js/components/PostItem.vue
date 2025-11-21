@@ -142,12 +142,7 @@ export default {
 };
 </script>
 <template>
-    <li
-        :class="[
-            'post-item border-b border-gray-200',
-            compact ? 'py-3' : 'py-5',
-        ]"
-    >
+    <li :class="['post-item', compact ? 'py-1' : 'py-2']">
         <div class="flex items-start gap-4">
             <!-- index -->
             <div
@@ -177,21 +172,17 @@ export default {
                 <div
                     :class="
                         compact
-                            ? 'text-xs text-gray-600 mb-2 flex flex-wrap gap-3 items-center'
-                            : 'text-xs sm:text-sm text-gray-600 mb-3 flex flex-wrap gap-3 items-center'
+                            ? 'text-xs text-gray-600 mb-1 flex flex-wrap gap-2 items-center'
+                            : 'text-xs sm:text-sm text-gray-600 mb-1 flex flex-wrap gap-2 items-center'
                     "
                 >
                     <span class="tabcoins text-[#006400] font-medium">
                         {{ tabcoinsLabel }}
                     </span>
                     <span v-if="showComments">·</span>
-                    <span v-if="showComments" class="comments">{{
-                        commentsLabel
-                    }}</span>
+                    <span v-if="showComments" class="comments">{{ commentsLabel }}</span>
                     <span v-if="showComments">·</span>
-                    <span v-if="post.author" class="author">{{
-                        post.author
-                    }}</span>
+                    <span v-if="post.author" class="author">{{ post.author }}</span>
                     <span>·</span>
                     <span class="time">{{ formattedDate }}</span>
                 </div>
@@ -251,10 +242,7 @@ export default {
                             <span>Excluir</span>
                         </button>
                     </div>
-                    <div
-                        v-if="actionError"
-                        class="ml-auto text-red-600 text-sm"
-                    >
+                    <div v-if="actionError" class="ml-auto text-red-600 text-sm">
                         {{ actionError }}
                     </div>
                     <Modal
@@ -267,10 +255,7 @@ export default {
                         cancelText="Cancelar"
                     >
                         <div>Tem certeza que deseja excluir este post?</div>
-                        <div
-                            v-if="deleteError"
-                            class="text-red-600 text-sm mt-2"
-                        >
+                        <div v-if="deleteError" class="text-red-600 text-sm mt-2">
                             {{ deleteError }}
                         </div>
                     </Modal>

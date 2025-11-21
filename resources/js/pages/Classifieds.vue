@@ -1,11 +1,11 @@
 <script>
-import StandardLayout from "../components/StandardLayout.vue";
+// usando AppLayout como layout padrão (definido em app.js)
 import PostList from "../components/PostList.vue";
 import { useClassifiedsStore } from "../stores/classifieds";
 
 export default {
     name: "Classifieds",
-    components: { StandardLayout, PostList },
+    components: { PostList },
     data() {
         return {
             loading: false,
@@ -37,42 +37,38 @@ export default {
 </script>
 
 <template>
-    <StandardLayout>
-        <div class="mt-8 text-left">
-            <!-- Lista de classificados -->
-            <div class="flex flex-col gap-6">
-                <a
-                    v-for="(classified, index) in classifieds"
-                    :key="index"
-                    href="#"
-                    @click.prevent="openClassified(classified.id)"
-                    class="block border-b border-gray-100 pb-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+    <div class="mt-8">
+        <!-- Lista de classificados -->
+        <div class="flex flex-col gap-2">
+            <a
+                v-for="(classified, index) in classifieds"
+                :key="index"
+                href="#"
+                @click.prevent="openClassified(classified.id)"
+                class="block pb-1 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+            >
+                <p
+                    class="text-gray-900 font-medium text-base group-hover:text-blue-700 group-hover:underline"
                 >
-                    <p
-                        class="text-gray-900 font-medium text-base group-hover:text-blue-700 group-hover:underline"
-                    >
-                        {{ classified.title }}
-                    </p>
-                    <div
-                        class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2"
-                    >
-                        <span class="text-gray-700">Patrocinado</span>
-                        <span>·</span>
-                        <span>
-                            {{ classified.comments }}
-                            {{
-                                classified.comments === 1
-                                    ? "comentário"
-                                    : "comentários"
-                            }}
-                        </span>
-                        <span>·</span>
-                        <span>{{ classified.username }}</span>
-                        <span>·</span>
-                        <span>{{ classified.time }}</span>
-                    </div>
-                </a>
-            </div>
+                    {{ classified.title }}
+                </p>
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2">
+                    <span class="text-gray-700">Patrocinado</span>
+                    <span>·</span>
+                    <span>
+                        {{ classified.comments }}
+                        {{
+                            classified.comments === 1
+                                ? "comentário"
+                                : "comentários"
+                        }}
+                    </span>
+                    <span>·</span>
+                    <span>{{ classified.username }}</span>
+                    <span>·</span>
+                    <span>{{ classified.time }}</span>
+                </div>
+            </a>
         </div>
-    </StandardLayout>
+    </div>
 </template>

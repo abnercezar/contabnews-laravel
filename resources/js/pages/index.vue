@@ -169,18 +169,10 @@ export default {
 </script>
 
 <template>
-    <div class="min-h-screen bg-white flex flex-col">
-        <main class="main-content flex-1">
-            <div class="container mx-auto px-4">
-                <!-- Sub-abas agora são renderizadas pelo Header (fixas abaixo do header) -->
+    <div class="mt-8">
+        <!-- Sub-abas agora são renderizadas pelo Header (fixas abaixo do header) -->
 
-                <PostList
-                    :posts="posts"
-                    :filter="activeSubTab"
-                    @open="openPost"
-                />
-            </div>
-        </main>
+        <PostList :posts="posts" :filter="activeSubTab" @open="openPost" />
     </div>
 </template>
 

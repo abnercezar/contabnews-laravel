@@ -1,5 +1,4 @@
 <script>
-import StandardLayout from "../components/StandardLayout.vue";
 import Modal from "../components/Modal.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import { useCommentsStore } from "../stores/comments";
@@ -9,7 +8,6 @@ import { onMounted } from "vue";
 export default {
     name: "Comments",
     components: {
-        StandardLayout,
         Modal,
         MarkdownEditor,
     },
@@ -295,204 +293,200 @@ export default {
 </script>
 
 <template>
-    <StandardLayout>
-        <div class="mt-8 text-left">
-            <!-- Cabeçalho da publicação -->
-            <div class="mb-4">
-                <a
-                    href="#"
-                    @click.prevent="openPostItem(post)"
-                    class="text-blue-700 font-medium hover:underline text-sm"
-                >
-                    {{ post.title }}
-                </a>
+    <div class="mt-8">
+        <!-- Cabeçalho da publicação -->
+        <div class="mb-4">
+            <a
+                href="#"
+                @click.prevent="openPostItem(post)"
+                class="text-blue-700 font-medium hover:underline text-sm"
+            >
+                {{ post.title }}
+            </a>
 
-                <p class="text-gray-500 text-xs mt-1">
-                    Contribuindo com
-                    <span class="text-black font-medium">
-                        {{ post.author }}
-                    </span>
+            <p class="text-gray-500 text-xs mt-1">
+                Contribuindo com
+                <span class="text-black font-medium">
+                    {{ post.author }}
+                </span>
+            </p>
+        </div>
+
+        <!-- LISTA DE COMENTÁRIOS -->
+        <div class="flex flex-col gap-2">
+            <a
+                v-for="(comment, index) in comments"
+                :key="comment.id"
+                href="#"
+                @click.prevent="openComment(comment)"
+                class="block pb-1 rounded-md px-2 hover:bg-gray-50 transition-all duration-150 cursor-pointer group"
+            >
+                <p
+                    class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
+                >
+                    {{ comment.body }}
                 </p>
-            </div>
+            </a>
+        </div>
 
-            <!-- LISTA DE COMENTÁRIOS -->
-            <div class="flex flex-col gap-5">
-                <a
-                    v-for="(comment, index) in comments"
-                    :key="comment.id"
-                    href="#"
-                    @click.prevent="openComment(comment)"
-                    class="block border-b border-gray-200 pb-4 rounded-md px-2 hover:bg-gray-50 transition-all duration-150 cursor-pointer group"
-                >
-                    <p
-                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
-                    >
-                        {{ comment.body }}
-                    </p>
-                </a>
-            </div>
-
-            <!-- MODAL DO COMENTÁRIO EXPANDIDO -->
-            <transition name="fade">
+        <!-- MODAL DO COMENTÁRIO EXPANDIDO -->
+        <transition name="fade">
+            <div
+                v-if="expandedComment"
+                class="fixed inset-0 z-40 flex items-center justify-center"
+            >
                 <div
-                    v-if="expandedComment"
-                    class="fixed inset-0 z-40 flex items-center justify-center"
+                    class="absolute inset-0 bg-black/40"
+                    @click="expandedComment = null"
+                ></div>
+
+                <div
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
                 >
-                    <div
-                        class="absolute inset-0 bg-black/40"
-                        @click="expandedComment = null"
-                    ></div>
-
-                    <div
-                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
-                    >
-                        <!-- Header do comentário -->
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <div class="text-sm text-gray-700 font-medium">
-                                    {{
-                                        expandedComment.user?.name || "Anônimo"
-                                    }}
-                                </div>
-
-                                <div class="text-xs text-gray-500">
-                                    {{ formatDate(expandedComment.created_at) }}
-                                </div>
+                    <!-- Header do comentário -->
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-sm text-gray-700 font-medium">
+                                {{ expandedComment.user?.name || "Anônimo" }}
                             </div>
 
-                            <button
-                                @click="expandedComment = null"
-                                class="text-gray-500"
-                            >
-                                ✕
-                            </button>
+                            <div class="text-xs text-gray-500">
+                                {{ formatDate(expandedComment.created_at) }}
+                            </div>
                         </div>
 
-                        <!-- Corpo do comentário -->
-                        <div class="mt-4 text-gray-800 whitespace-pre-wrap">
-                            {{ expandedComment.body }}
-                        </div>
+                        <button
+                            @click="expandedComment = null"
+                            class="text-gray-500"
+                        >
+                            ✕
+                        </button>
+                    </div>
 
-                        <!-- Ações -->
-                        <div class="mt-4 flex justify-end gap-2">
-                            <button
-                                v-if="isCommentAuthor(expandedComment)"
-                                @click="openEditFromMenu(expandedComment)"
-                                class="px-3 py-1 bg-gray-100 rounded"
-                            >
-                                Editar
-                            </button>
+                    <!-- Corpo do comentário -->
+                    <div class="mt-4 text-gray-800 whitespace-pre-wrap">
+                        {{ expandedComment.body }}
+                    </div>
 
-                            <button
-                                v-if="isCommentAuthor(expandedComment)"
-                                @click="deleteFromMenu(expandedComment)"
-                                class="px-3 py-1 bg-red-600 text-white rounded"
-                            >
-                                Apagar
-                            </button>
+                    <!-- Ações -->
+                    <div class="mt-4 flex justify-end gap-2">
+                        <button
+                            v-if="isCommentAuthor(expandedComment)"
+                            @click="openEditFromMenu(expandedComment)"
+                            class="px-3 py-1 bg-gray-100 rounded"
+                        >
+                            Editar
+                        </button>
 
-                            <button
-                                @click="shareComment(expandedComment)"
-                                class="px-3 py-1 bg-white border rounded"
-                            >
-                                Compartilhar
-                            </button>
+                        <button
+                            v-if="isCommentAuthor(expandedComment)"
+                            @click="deleteFromMenu(expandedComment)"
+                            class="px-3 py-1 bg-red-600 text-white rounded"
+                        >
+                            Apagar
+                        </button>
 
-                            <button
-                                @click="replyToComment(expandedComment)"
-                                class="px-3 py-1 bg-[#d3ad71] text-white rounded"
-                            >
-                                Responder
-                            </button>
-                        </div>
+                        <button
+                            @click="shareComment(expandedComment)"
+                            class="px-3 py-1 bg-white border rounded"
+                        >
+                            Compartilhar
+                        </button>
+
+                        <button
+                            @click="replyToComment(expandedComment)"
+                            class="px-3 py-1 bg-[#d3ad71] text-white rounded"
+                        >
+                            Responder
+                        </button>
                     </div>
                 </div>
-            </transition>
+            </div>
+        </transition>
 
-            <!-- MODAL DE EDIÇÃO -->
-            <transition name="fade">
-                <div
-                    v-if="showCommentEditModal"
-                    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
-                >
-                    <div
-                        class="absolute inset-0 bg-black/40"
-                        @click="showCommentEditModal = false"
-                    ></div>
-
-                    <div
-                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
-                    >
-                        <h3
-                            class="text-lg font-semibold mb-4 flex items-center gap-2"
-                        >
-                            ✏️ Editar comentário
-                        </h3>
-
-                        <MarkdownEditor v-model="commentEdit.body" />
-
-                        <div
-                            v-if="commentEditErrors.body"
-                            class="text-red-600 text-sm mt-2"
-                        >
-                            {{ commentEditErrors.body[0] }}
-                        </div>
-
-                        <div class="mt-4 flex justify-end gap-2">
-                            <button
-                                @click="showCommentEditModal = false"
-                                class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition"
-                            >
-                                Cancelar
-                            </button>
-
-                            <button
-                                @click="submitCommentEdit"
-                                class="px-4 py-2 bg-[#d3ad71] text-white rounded hover:bg-[#c19a5f] transition"
-                            >
-                                Salvar
-                            </button>
-                        </div>
-
-                        <div
-                            v-if="commentEditError"
-                            class="text-red-600 text-sm mt-3"
-                        >
-                            {{ commentEditError }}
-                        </div>
-                    </div>
-                </div>
-            </transition>
-
-            <!-- MODAL DE EXCLUSÃO -->
-            <Modal
-                :visible="showCommentDeleteModal"
-                title="Apagar comentário"
-                @confirm="deleteComment"
-                @cancel="showCommentDeleteModal = false"
-                :loading="commentDeleteLoading"
-                confirmText="Apagar"
-                cancelText="Cancelar"
+        <!-- MODAL DE EDIÇÃO -->
+        <transition name="fade">
+            <div
+                v-if="showCommentEditModal"
+                class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
             >
-                <div class="flex items-start gap-3">
-                    <span class="text-red-600 text-xl">🗑️</span>
+                <div
+                    class="absolute inset-0 bg-black/40"
+                    @click="showCommentEditModal = false"
+                ></div>
 
-                    <div>
-                        <div class="font-medium">
-                            Tem certeza que deseja apagar este comentário?
-                        </div>
+                <div
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
+                >
+                    <h3
+                        class="text-lg font-semibold mb-4 flex items-center gap-2"
+                    >
+                        ✏️ Editar comentário
+                    </h3>
 
-                        <div
-                            v-if="commentDeleteError"
-                            class="text-red-600 text-sm mt-2"
+                    <MarkdownEditor v-model="commentEdit.body" />
+
+                    <div
+                        v-if="commentEditErrors.body"
+                        class="text-red-600 text-sm mt-2"
+                    >
+                        {{ commentEditErrors.body[0] }}
+                    </div>
+
+                    <div class="mt-4 flex justify-end gap-2">
+                        <button
+                            @click="showCommentEditModal = false"
+                            class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition"
                         >
-                            {{ commentDeleteError }}
-                        </div>
+                            Cancelar
+                        </button>
+
+                        <button
+                            @click="submitCommentEdit"
+                            class="px-4 py-2 bg-[#d3ad71] text-white rounded hover:bg-[#c19a5f] transition"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+
+                    <div
+                        v-if="commentEditError"
+                        class="text-red-600 text-sm mt-3"
+                    >
+                        {{ commentEditError }}
                     </div>
                 </div>
-            </Modal>
-        </div>
-    </StandardLayout>
+            </div>
+        </transition>
+
+        <!-- MODAL DE EXCLUSÃO -->
+        <Modal
+            :visible="showCommentDeleteModal"
+            title="Apagar comentário"
+            @confirm="deleteComment"
+            @cancel="showCommentDeleteModal = false"
+            :loading="commentDeleteLoading"
+            confirmText="Apagar"
+            cancelText="Cancelar"
+        >
+            <div class="flex items-start gap-3">
+                <span class="text-red-600 text-xl">🗑️</span>
+
+                <div>
+                    <div class="font-medium">
+                        Tem certeza que deseja apagar este comentário?
+                    </div>
+
+                    <div
+                        v-if="commentDeleteError"
+                        class="text-red-600 text-sm mt-2"
+                    >
+                        {{ commentDeleteError }}
+                    </div>
+                </div>
+            </div>
+        </Modal>
+    </div>
 </template>
 
 <style>

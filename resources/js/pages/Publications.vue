@@ -1,12 +1,12 @@
 <script>
-import StandardLayout from "../components/StandardLayout.vue";
+// usando AppLayout como layout padrão (definido em app.js)
 import { usePostsStore } from "../stores/posts";
 import { useAuthStore } from "../stores/auth";
 import PostList from "../components/PostList.vue";
 
 export default {
     name: "Publications",
-    components: { StandardLayout, PostList },
+    components: { PostList },
     props: {
         newPost: {
             type: [Object, null],
@@ -144,43 +144,34 @@ export default {
 </script>
 
 <template>
-    <StandardLayout>
-        <div class="mt-8 text-left">
-            <div class="mb-4">
-                <h2 class="text-2xl font-semibold">
-                    {{ isMine ? "Minhas publicações" : "Publicações" }}
-                </h2>
-            </div>
-            <!-- Lista de publicações usando PostList -->
-            <div class="mb-4">
-                <template v-if="isMine && !isAuthenticated">
-                    <div
-                        class="p-4 bg-yellow-50 border border-yellow-200 rounded"
-                    >
-                        <p class="text-gray-700">{{ emptyMessage }}</p>
-                        <div class="mt-2">
-                            <a href="/login" class="text-blue-600 underline"
-                                >Fazer login</a
-                            >
-                        </div>
+    <div class="mt-8">
+        <!-- Lista de publicações usando PostList -->
+        <div class="mb-4">
+            <template v-if="isMine && !isAuthenticated">
+                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded">
+                    <p class="text-gray-700">{{ emptyMessage }}</p>
+                    <div class="mt-2">
+                        <a href="/login" class="text-blue-600 underline"
+                            >Fazer login</a
+                        >
                     </div>
-                </template>
-                <template v-else>
-                    <PostList
-                        :posts="postsList"
-                        filter="Publicações"
-                        @open="openById"
-                    />
-                    <div
-                        v-if="(postsList || []).length === 0"
-                        class="mt-4 text-gray-600"
-                    >
-                        {{ emptyMessage }}
-                    </div>
-                </template>
-            </div>
+                </div>
+            </template>
+            <template v-else>
+                <PostList
+                    :posts="postsList"
+                    filter="Publicações"
+                    @open="openById"
+                />
+                <div
+                    v-if="(postsList || []).length === 0"
+                    class="mt-4 text-gray-600"
+                >
+                    {{ emptyMessage }}
+                </div>
+            </template>
         </div>
-    </StandardLayout>
+    </div>
 </template>
 
 <style scoped>
