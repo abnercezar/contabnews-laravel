@@ -24,8 +24,8 @@ export default {
                     />
                 </span>
                 &copy; 2025
-                <span class="text-[#daa520] font-bold">ConTabNews</span> - Todos
-                os direitos reservados
+                <span class="text-[#daa520] font-bold">Support</span> - Todos os
+                direitos reservados
             </p>
         </div>
     </footer>

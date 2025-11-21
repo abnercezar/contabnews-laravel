@@ -136,7 +136,7 @@ export default {
                         aria-hidden="true"
                     />
                 </span>
-                <span class="text-base sm:text-lg text-[#daa520]">Music</span>
+                <span class="text-base sm:text-lg text-[#daa520]">Support</span>
             </h1>
 
             <MainTabs :activeTab="activeTab" @tab-changed="selectTab" />
