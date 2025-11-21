@@ -321,11 +321,14 @@ export default {
                 @click.prevent="openComment(comment)"
                 class="block pb-1 rounded-md px-2 hover:bg-gray-50 transition-all duration-150 cursor-pointer group"
             >
-                <p
-                    class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
-                >
-                    {{ comment.body }}
-                </p>
+                <div class="flex items-start gap-3">
+                    <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
+                    <p
+                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
+                    >
+                        {{ comment.body }}
+                    </p>
+                </div>
             </a>
         </div>
 

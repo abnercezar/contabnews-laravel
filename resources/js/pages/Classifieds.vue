@@ -50,9 +50,10 @@ export default {
                 <p
                     class="text-gray-900 font-medium text-base group-hover:text-blue-700 group-hover:underline"
                 >
+                    <span class="text-gray-700 w-8 text-right font-bold inline-block mr-2">{{ index + 1 }}.</span>
                     {{ classified.title }}
                 </p>
-                <div class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2">
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2 pl-10">
                     <span class="text-gray-700">Patrocinado</span>
                     <span>·</span>
                     <span>

@@ -8,25 +8,26 @@
                 class="pb-1"
             >
                 <div class="mx-auto max-w-2xl text-left">
-                    <!-- Título (linkável) -->
-                    <a
-                        :href="itemUrl(item)"
-                        class="block text-base font-semibold text-gray-900 hover:text-blue-600"
-                        @click="handleOpen(item, $event)"
-                    >
-                        {{ item.title }}
-                    </a>
+                    <!-- Título (linkável) com numeração -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
+                        <a
+                            :href="itemUrl(item)"
+                            class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                            @click="handleOpen(item, $event)"
+                        >
+                            {{ item.title }}
+                        </a>
+                    </div>
 
                     <!-- Conteúdo do comentário -->
                     <!-- Rodapé com tabcoins, autor e tempo (comentários removidos conforme solicitado) -->
                     <div
-                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap"
+                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap pl-10"
                     >
                         <span>{{ item.tabcoins }} tabcoin</span>
                         <span>·</span>
-                        <span v-if="authorLabel(item)">{{
-                            authorLabel(item)
-                        }}</span>
+                        <span v-if="authorLabel(item)">{{ authorLabel(item) }}</span>
                         <span v-if="authorLabel(item)">·</span>
                         <span>{{ item.time }}</span>
                     </div>
@@ -43,19 +44,22 @@
             >
                 <div class="mx-auto max-w-2xl text-left">
                     <div class="flex items-start justify-between">
-                        <a
-                            :href="itemUrl(post)"
-                            class="block text-base font-semibold text-gray-900 hover:text-blue-600"
-                            @click="handleOpen(post, $event)"
-                        >
-                            {{ post.title }}
-                        </a>
+                        <div class="flex items-start gap-3">
+                            <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
+                            <a
+                                :href="itemUrl(post)"
+                                class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                                @click="handleOpen(post, $event)"
+                            >
+                                {{ post.title }}
+                            </a>
+                        </div>
 
                         <!-- menu moved to Content page (three-dots now shown in content view) -->
                     </div>
 
                     <div
-                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap"
+                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap pl-10"
                     >
                         <span>{{ tabcoinsLabel(post) }}</span>
                         <span>·</span>
