@@ -16,7 +16,7 @@
 
 <script>
 export default {
-    name: "WindowIcon",
+    name: "LegacyIcon",
     props: {
         size: {
             type: [Number, String],

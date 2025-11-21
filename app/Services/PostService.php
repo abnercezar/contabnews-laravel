@@ -8,12 +8,20 @@ use App\Actions\FindPostAction;
 use App\Actions\GetAllPostsAction;
 use App\Actions\UpdatePostAction;
 use App\Models\Post;
+use App\Models\User;
 
 class PostService
 {
-    public function create(array $data): Post
+    /**
+     * Create a post. Optionally pass the author User to associate the post.
+     *
+     * @param array $data
+     * @param User|null $author
+     * @return Post
+     */
+    public function create(array $data, ?User $author = null): Post
     {
-        return app(CreatePostAction::class)->execute($data);
+        return app(CreatePostAction::class)->execute($data, $author);
     }
 
     public function getAll()

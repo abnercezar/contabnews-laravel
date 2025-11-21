@@ -34,7 +34,18 @@ export default {
             if (item.label === "Deslogar") {
                 if (this.auth) this.auth.logout();
                 this.showHamburgerMenu = false;
-                window.location.href = "/";
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit("/");
+                    } else {
+                        window.location.href = "/";
+                    }
+                } catch (e) {
+                    window.location.href = "/";
+                }
                 return;
             }
 
@@ -45,16 +56,72 @@ export default {
                     try {
                         localStorage.setItem("intendedPath", "/content/create");
                     } catch (e) {}
-                    window.location.href = "/login";
+                    try {
+                        if (
+                            this.$inertia &&
+                            typeof this.$inertia.visit === "function"
+                        ) {
+                            this.$inertia.visit("/login");
+                        } else {
+                            window.location.href = "/login";
+                        }
+                    } catch (e) {
+                        window.location.href = "/login";
+                    }
                     return;
                 }
-                window.location.href = "/content/create";
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit("/content/create");
+                    } else {
+                        window.location.href = "/content/create";
+                    }
+                } catch (e) {
+                    window.location.href = "/content/create";
+                }
                 return;
             }
 
             if (item.label === "Meus conteúdos") {
                 this.showHamburgerMenu = false;
-                window.location.href = "/publications";
+                const isLogged = !!(this.auth && this.auth.token);
+                if (!isLogged) {
+                    try {
+                        localStorage.setItem(
+                            "intendedPath",
+                            "/publications?mine=1"
+                        );
+                    } catch (e) {}
+                    try {
+                        if (
+                            this.$inertia &&
+                            typeof this.$inertia.visit === "function"
+                        ) {
+                            this.$inertia.visit("/login");
+                        } else {
+                            window.location.href = "/login";
+                        }
+                    } catch (e) {
+                        window.location.href = "/login";
+                    }
+                    return;
+                }
+                // navega para a lista de publicações filtrada para o usuário atual (client-side quando possível)
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit("/publications?mine=1");
+                    } else {
+                        window.location.href = "/publications?mine=1";
+                    }
+                } catch (e) {
+                    window.location.href = "/publications?mine=1";
+                }
                 return;
             }
 

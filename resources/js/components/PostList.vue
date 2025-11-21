@@ -87,6 +87,15 @@ export default {
     },
     methods: {
         itemUrl(item) {
+            // If item looks like a comment (has post_id or post.id), link to parent post with anchor
+            const postId =
+                item?.post_id ??
+                item?.postId ??
+                item?.post?.id ??
+                item?.raw?.post_id ??
+                null;
+            if (postId) return `/content/${postId}#comment-${item?.id ?? ""}`;
+
             const id =
                 item?.id ??
                 item?.post_id ??
@@ -95,8 +104,46 @@ export default {
             return id ? `/content/${id}` : "#";
         },
 
-        handleOpen(item, event) {
+        async handleOpen(item, event) {
             console.log("[PostList] handleOpen item:", item);
+
+            // If this is a comment-like object, navigate to the parent post with anchor
+            let postId =
+                item?.post_id ??
+                item?.postId ??
+                item?.post?.id ??
+                item?.raw?.post_id ??
+                null;
+
+            // If we don't have a postId but have an item id (likely a comment id), try fetching it
+            if (!postId && item && item.id) {
+                try {
+                    const resp = await axios.get(`/api/comments/${item.id}`);
+                    const comment = resp.data;
+                    postId =
+                        comment?.post_id ??
+                        comment?.postId ??
+                        comment?.post?.id ??
+                        comment?.raw?.post_id ??
+                        null;
+                } catch (e) {
+                    // ignore
+                    console.debug(
+                        "[PostList] could not fetch comment to resolve postId",
+                        e
+                    );
+                }
+            }
+
+            if (postId) {
+                const url = `/content/${postId}#comment-${item?.id}`;
+                this.$emit("open", { url, postId, commentId: item?.id });
+                if (event && typeof event.preventDefault === "function")
+                    event.preventDefault();
+                return;
+            }
+
+            // Otherwise treat as a direct post-like item
             const id =
                 item?.id ??
                 item?.post_id ??
@@ -107,10 +154,11 @@ export default {
                 this.$emit("open", id);
                 if (event && typeof event.preventDefault === "function")
                     event.preventDefault();
-            } else {
-                console.warn("[PostList] item has no id, cannot open:", item);
-                // no id -> allow native navigation (href may point to external)
+                return;
             }
+
+            console.warn("[PostList] item has no id, cannot open:", item);
+            // no id -> allow native navigation (href may point to external)
         },
         tabcoinsLabel(post) {
             const n =

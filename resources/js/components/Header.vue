@@ -13,7 +13,7 @@ import SubTabs from "./SubTabs.vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import ConTabNewsIcon from "./ConTabNewsIcon.vue"; // Importando o novo ícone ConTabNews
 // usa o ícone Window oficial do Heroicons
-import { WindowIcon } from "@heroicons/vue/24/outline";
+import { MusicalNoteIcon } from "@heroicons/vue/24/outline";
 import icons from "./icons.js";
 import { useAuthStore } from "../stores/auth";
 import { onMounted } from "vue";
@@ -34,7 +34,7 @@ export default {
         SubTabs,
         DropdownMenu,
         ConTabNewsIcon,
-        WindowIcon,
+        MusicalNoteIcon,
     },
     props: {
         activeTab: {
@@ -86,7 +86,25 @@ export default {
             // busca o usuário se o token existir; define flag local para o template
             this.auth.fetchUser().then((u) => {
                 this.isLoggedIn = !!u;
+                if (u && u.name) {
+                    this.hamburgerItems[0].label = u.name;
+                }
             });
+
+            // observa mudanças no usuário (login/logout) para manter o label sincronizado
+            try {
+                this.$watch(
+                    () => this.auth && this.auth.user,
+                    (newUser) => {
+                        if (newUser && newUser.name) {
+                            this.hamburgerItems[0].label = newUser.name;
+                        } else {
+                            this.hamburgerItems[0].label = "ACA";
+                        }
+                    },
+                    { immediate: true }
+                );
+            } catch (e) {}
         } catch (e) {
             this.isLoggedIn = false;
         }
@@ -109,7 +127,7 @@ export default {
                 class="logo flex items-center text-lg sm:text-xl font-bold mr-2 ml-0 pl-0 whitespace-nowrap mb-2 sm:mb-0"
             >
                 <span class="mr-2">
-                    <WindowIcon
+                    <MusicalNoteIcon
                         :class="
                             windowWidth < 640
                                 ? 'w-7 h-7 text-[#daa520]'
@@ -118,9 +136,7 @@ export default {
                         aria-hidden="true"
                     />
                 </span>
-                <span class="text-base sm:text-lg text-[#daa520]"
-                    >Tabnews de CRM</span
-                >
+                <span class="text-base sm:text-lg text-[#daa520]">Music</span>
             </h1>
 
             <MainTabs :activeTab="activeTab" @tab-changed="selectTab" />

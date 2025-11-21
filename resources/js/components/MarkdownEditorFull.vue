@@ -23,15 +23,6 @@
             class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50 resize-none mb-4"
             :placeholder="placeholder"
         ></textarea>
-        <div class="mt-4">
-            <label class="block text-sm font-semibold mb-2 text-gray-700"
-                >Preview</label
-            >
-            <div
-                class="border rounded bg-gray-50 p-4 markdown-body"
-                v-html="rendered"
-            ></div>
-        </div>
     </div>
 </template>
 

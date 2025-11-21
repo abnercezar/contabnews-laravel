@@ -129,8 +129,31 @@ export default {
         onHeaderSubtabChanged(sub) {
             this.activeSubTab = sub;
         },
-        openPost(id) {
-            console.log("[Index] openPost", id);
+        openPost(payload) {
+            console.log("[Index] openPost", payload);
+            if (!payload) return;
+
+            // If PostList emitted an object with a precomputed URL (comment case), use it
+            if (payload && typeof payload === "object" && payload.url) {
+                const url = payload.url;
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    )
+                        this.$inertia.visit(url);
+                    else window.location.href = url;
+                } catch (e) {
+                    window.location.href = url;
+                }
+                return;
+            }
+
+            // Otherwise payload is an id (number|string) or an object with postId
+            const id =
+                payload && typeof payload === "object"
+                    ? payload.postId ?? null
+                    : payload;
             if (!id) return;
             const url = `/content/${id}`;
             try {

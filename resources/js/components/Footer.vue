@@ -1,10 +1,10 @@
 <script>
-import { WindowIcon } from "@heroicons/vue/24/outline";
+import { MusicalNoteIcon } from "@heroicons/vue/24/outline";
 
 export default {
     name: "Footer",
     components: {
-        WindowIcon,
+        MusicalNoteIcon,
     },
 };
 </script>
@@ -18,7 +18,7 @@ export default {
                 class="text-xs sm:text-base flex items-center justify-center gap-2"
             >
                 <span class="inline-flex items-center pointer-events-none">
-                    <WindowIcon
+                    <MusicalNoteIcon
                         class="w-4 h-4 text-[#daa520] mr-1 pointer-events-none"
                         aria-hidden="true"
                     />

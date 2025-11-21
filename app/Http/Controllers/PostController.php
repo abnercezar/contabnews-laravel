@@ -21,14 +21,31 @@ class PostController extends Controller
         // Paginação + cache simples para evitar retornar todo o conjunto e reduzir a carga no banco.
         $perPage = (int) request()->get('per_page', 50);
         $page = (int) request()->get('page', 1);
-        $cacheKey = "posts:page:{$page}:per:{$perPage}";
 
-        $data = Cache::remember($cacheKey, 30, function () use ($perPage) {
+        // Option to request only the current user's posts: ?mine=1
+        $mine = filter_var(request()->get('mine', false), FILTER_VALIDATE_BOOLEAN);
+        $user = request()->user();
+
+        $cacheKey = "posts:page:{$page}:per:{$perPage}:mine:" . ($mine ? '1' : '0') . ($user ? ":user:{$user->id}" : ':guest');
+
+        $data = Cache::remember($cacheKey, 30, function () use ($perPage, $mine, $user) {
             // Ordenar pelos mais recentes primeiro e eager-load de comentários + usuário do comentário.
-            return Post::with(['comments.user'])
-                ->orderBy('created_at', 'desc')
-                ->paginate($perPage)
-                ->items();
+            $query = Post::with(['comments.user'])->orderBy('created_at', 'desc');
+
+            // Se o cliente pediu apenas os seus posts, aplique filtro por user_id
+            if ($mine) {
+                if ($user) {
+                    // Admin vê tudo
+                    if (($user->role ?? '') !== 'admin') {
+                        $query->where('user_id', $user->id);
+                    }
+                } else {
+                    // não autenticado: retorna coleção vazia
+                    return [];
+                }
+            }
+
+            return $query->paginate($perPage)->items();
         });
 
         // Se o usuário estiver autenticado, anexa `my_reaction` a cada post usando Redis (rápido) com fallback para BD.

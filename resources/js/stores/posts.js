@@ -10,10 +10,20 @@ export const usePostsStore = defineStore("posts", {
         all: (state) => state.posts,
     },
     actions: {
-        async fetchPosts() {
+        async fetchPosts(options = {}) {
             this.loading = true;
             try {
-                const res = await axios.get("/api/posts");
+                const params = {};
+                if (options.mine) params.mine = 1;
+                // garante que o token local seja enviado mesmo que axios.defaults não tenha sido inicializado
+                const token =
+                    typeof window !== "undefined"
+                        ? localStorage.getItem("token")
+                        : null;
+                const headers = token
+                    ? { Authorization: `Bearer ${token}` }
+                    : {};
+                const res = await axios.get("/api/posts", { params, headers });
                 let list = Array.isArray(res.data) ? res.data : [];
 
                 // normaliza cada post para garantir um flag booleano consistente

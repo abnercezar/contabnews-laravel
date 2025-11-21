@@ -18,6 +18,8 @@ class CreatePostAction
     {
         if ($author) {
             $data['author'] = $author->name;
+            // assegura que a relação com o usuário autenticado seja registrada
+            $data['user_id'] = $author->id;
         }
 
         return Post::create($data);
