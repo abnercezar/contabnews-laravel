@@ -180,9 +180,13 @@ export default {
                         {{ tabcoinsLabel }}
                     </span>
                     <span v-if="showComments">·</span>
-                    <span v-if="showComments" class="comments">{{ commentsLabel }}</span>
+                    <span v-if="showComments" class="comments">{{
+                        commentsLabel
+                    }}</span>
                     <span v-if="showComments">·</span>
-                    <span v-if="post.author" class="author">{{ post.author }}</span>
+                    <span v-if="post.author" class="author">{{
+                        post.author
+                    }}</span>
                     <span>·</span>
                     <span class="time">{{ formattedDate }}</span>
                 </div>
@@ -242,7 +246,10 @@ export default {
                             <span>Excluir</span>
                         </button>
                     </div>
-                    <div v-if="actionError" class="ml-auto text-red-600 text-sm">
+                    <div
+                        v-if="actionError"
+                        class="ml-auto text-red-600 text-sm"
+                    >
                         {{ actionError }}
                     </div>
                     <Modal
@@ -255,7 +262,10 @@ export default {
                         cancelText="Cancelar"
                     >
                         <div>Tem certeza que deseja excluir este post?</div>
-                        <div v-if="deleteError" class="text-red-600 text-sm mt-2">
+                        <div
+                            v-if="deleteError"
+                            class="text-red-600 text-sm mt-2"
+                        >
                             {{ deleteError }}
                         </div>
                     </Modal>

@@ -36,7 +36,11 @@
 
         <!-- Outras abas (ex: Publicações, Comentários, etc) -->
         <div v-else class="space-y-1">
-            <div v-for="(post, index) in posts" :key="index" class="pb-1 relative">
+            <div
+                v-for="(post, index) in posts"
+                :key="index"
+                class="pb-1 relative"
+            >
                 <div class="mx-auto max-w-2xl text-left">
                     <div class="flex items-start justify-between">
                         <a
