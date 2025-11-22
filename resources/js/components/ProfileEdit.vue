@@ -1,90 +1,3 @@
-<template>
-    <div class="w-full max-w-3xl mx-auto p-6 bg-white rounded shadow">
-        <h3 class="text-2xl font-bold mb-4">Editar Perfil</h3>
-
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700"
-                    >Nome de usuário <span class="text-red-600">*</span></label
-                >
-                <input
-                    v-model="form.name"
-                    class="mt-1 block w-full border rounded px-3 py-3 bg-gray-50"
-                />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700"
-                    >Email <span class="text-red-600">*</span></label
-                >
-                <input
-                    v-model="form.email"
-                    class="mt-1 block w-full border rounded px-3 py-3"
-                />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700"
-                    >Descrição</label
-                >
-                <MarkdownEditor v-model="form.description" placeholder="">
-                    <template #header-right>
-                        {{ (form.description || "").length }}/5000
-                    </template>
-                </MarkdownEditor>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <input
-                    id="notify"
-                    type="checkbox"
-                    v-model="form.receive_notifications"
-                    class="w-4 h-4"
-                />
-                <label for="notify" class="text-sm text-gray-700"
-                    >Receber notificações por email</label
-                >
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700"
-                    >Senha</label
-                >
-                <div class="mt-1 text-sm text-blue-600">
-                    <a href="/password/reset"
-                        >Utilize o fluxo de recuperação de senha →</a
-                    >
-                </div>
-            </div>
-
-            <div class="text-sm text-gray-600">
-                Os campos marcados com um asterisco (*) são obrigatórios.
-            </div>
-
-            <div>
-                <button
-                    @click="save"
-                    :disabled="saving"
-                    class="w-full py-3 bg-green-600 text-white rounded font-semibold"
-                >
-                    Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <Modal
-        :visible="showErrorModal"
-        title="Erro ao salvar perfil"
-        :message="errorMessage"
-        @confirm="closeError"
-        @cancel="closeError"
-        :confirmText="'Fechar'"
-        :cancelText="'Cancelar'"
-        :loading="false"
-    />
-</template>
-
 <script>
 import { ref, watch } from "vue";
 import axios from "axios";
@@ -191,3 +104,90 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="w-full max-w-3xl mx-auto p-6 bg-white rounded shadow">
+        <h3 class="text-2xl font-bold mb-4">Editar Perfil</h3>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700"
+                    >Nome de usuário <span class="text-red-600">*</span></label
+                >
+                <input
+                    v-model="form.name"
+                    class="mt-1 block w-full border rounded px-3 py-3 bg-gray-50"
+                />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700"
+                    >Email <span class="text-red-600">*</span></label
+                >
+                <input
+                    v-model="form.email"
+                    class="mt-1 block w-full border rounded px-3 py-3"
+                />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700"
+                    >Descrição</label
+                >
+                <MarkdownEditor v-model="form.description" placeholder="">
+                    <template #header-right>
+                        {{ (form.description || "").length }}/5000
+                    </template>
+                </MarkdownEditor>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input
+                    id="notify"
+                    type="checkbox"
+                    v-model="form.receive_notifications"
+                    class="w-4 h-4"
+                />
+                <label for="notify" class="text-sm text-gray-700"
+                    >Receber notificações por email</label
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700"
+                    >Senha</label
+                >
+                <div class="mt-1 text-sm text-blue-600">
+                    <a href="/password/reset"
+                        >Utilize o fluxo de recuperação de senha →</a
+                    >
+                </div>
+            </div>
+
+            <div class="text-sm text-gray-600">
+                Os campos marcados com um asterisco (*) são obrigatórios.
+            </div>
+
+            <div>
+                <button
+                    @click="save"
+                    :disabled="saving"
+                    class="w-full py-3 bg-green-600 text-white rounded font-semibold"
+                >
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <Modal
+        :visible="showErrorModal"
+        title="Erro ao salvar perfil"
+        :message="errorMessage"
+        @confirm="closeError"
+        @cancel="closeError"
+        :confirmText="'Fechar'"
+        :cancelText="'Cancelar'"
+        :loading="false"
+    />
+</template>

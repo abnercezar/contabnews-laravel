@@ -1,3 +1,13 @@
+<script>
+export default {
+    name: "InlineToast",
+    props: {
+        message: { type: String, default: "" },
+        visible: { type: Boolean, default: false },
+    },
+};
+</script>
+
 <template>
     <transition name="fade">
         <div
@@ -8,16 +18,6 @@
         </div>
     </transition>
 </template>
-
-<script>
-export default {
-    name: "InlineToast",
-    props: {
-        message: { type: String, default: "" },
-        visible: { type: Boolean, default: false },
-    },
-};
-</script>
 
 <style scoped>
 .fade-enter-active,

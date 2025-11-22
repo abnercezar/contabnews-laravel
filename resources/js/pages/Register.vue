@@ -1,3 +1,56 @@
+<script>
+export default {
+    name: "Register",
+    data() {
+        return {
+            form: {
+                name: "",
+                email: "",
+                password: "",
+                password_confirmation: "",
+            },
+            showPassword: false,
+            showPasswordConfirm: false,
+            acceptedTerms: false,
+            loading: false,
+            error: "",
+            success: "",
+        };
+    },
+    methods: {
+        async register() {
+            this.error = "";
+            this.success = "";
+            this.loading = true;
+            try {
+                const response = await fetch("/api/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(this.form),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    this.success =
+                        data.message || "Cadastro realizado com sucesso!";
+                    this.form = {
+                        name: "",
+                        email: "",
+                        password: "",
+                        password_confirmation: "",
+                    };
+                    this.acceptedTerms = false;
+                } else {
+                    this.error = data.message || "Erro ao cadastrar usuário.";
+                }
+            } catch (e) {
+                this.error = "Erro de conexão com o servidor.";
+            }
+            this.loading = false;
+        },
+    },
+};
+</script>
+
 <template>
     <div
         class="min-h-screen flex flex-col justify-center items-center bg-gray-50"
@@ -176,55 +229,3 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    name: "Register",
-    data() {
-        return {
-            form: {
-                name: "",
-                email: "",
-                password: "",
-                password_confirmation: "",
-            },
-            showPassword: false,
-            showPasswordConfirm: false,
-            acceptedTerms: false,
-            loading: false,
-            error: "",
-            success: "",
-        };
-    },
-    methods: {
-        async register() {
-            this.error = "";
-            this.success = "";
-            this.loading = true;
-            try {
-                const response = await fetch("/api/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(this.form),
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    this.success =
-                        data.message || "Cadastro realizado com sucesso!";
-                    this.form = {
-                        name: "",
-                        email: "",
-                        password: "",
-                        password_confirmation: "",
-                    };
-                    this.acceptedTerms = false;
-                } else {
-                    this.error = data.message || "Erro ao cadastrar usuário.";
-                }
-            } catch (e) {
-                this.error = "Erro de conexão com o servidor.";
-            }
-            this.loading = false;
-        },
-    },
-};
-</script>

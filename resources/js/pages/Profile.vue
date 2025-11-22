@@ -44,20 +44,6 @@ export default {
     <div class="min-h-screen bg-white flex flex-col">
         <div class="flex-1 flex flex-col items-center mt-8">
             <div class="w-full max-w-4xl p-8 mx-4 sm:mx-auto">
-                <div v-if="!editMode" class="p-4 bg-white rounded shadow">
-                    <h3 class="text-lg font-semibold mb-2">Dados</h3>
-                    <p><strong>Nome:</strong> {{ auth.user?.name }}</p>
-                    <p><strong>Email:</strong> {{ auth.user?.email }}</p>
-                    <div class="mt-4">
-                        <button
-                            @click="editMode = true"
-                            class="px-3 py-2 bg-[#ff7b00] text-white rounded"
-                        >
-                            Editar perfil
-                        </button>
-                    </div>
-                </div>
-
                 <ProfileEdit
                     v-if="editMode"
                     :initial="auth.user"

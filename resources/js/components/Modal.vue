@@ -1,3 +1,32 @@
+<script>
+export default {
+    name: "Modal",
+    props: {
+        visible: { type: Boolean, default: false },
+        title: { type: String, default: "" },
+        message: { type: String, default: "" },
+        confirmText: { type: String, default: "Confirmar" },
+        cancelText: { type: String, default: "Cancelar" },
+        confirmClass: {
+            type: String,
+            default: "bg-[#d3ad71] text-white hover:bg-[#bfae76]",
+        },
+        showClose: { type: Boolean, default: true },
+        loading: { type: Boolean, default: false },
+    },
+    emits: ["close", "confirm", "cancel"],
+    methods: {
+        onCancel() {
+            this.$emit("cancel");
+            this.$emit("close");
+        },
+        onConfirm() {
+            this.$emit("confirm");
+        },
+    },
+};
+</script>
+
 <template>
     <div
         v-if="visible"
@@ -63,35 +92,6 @@
         </div>
     </div>
 </template>
-
-<script>
-export default {
-    name: "Modal",
-    props: {
-        visible: { type: Boolean, default: false },
-        title: { type: String, default: "" },
-        message: { type: String, default: "" },
-        confirmText: { type: String, default: "Confirmar" },
-        cancelText: { type: String, default: "Cancelar" },
-        confirmClass: {
-            type: String,
-            default: "bg-[#d3ad71] text-white hover:bg-[#bfae76]",
-        },
-        showClose: { type: Boolean, default: true },
-        loading: { type: Boolean, default: false },
-    },
-    emits: ["close", "confirm", "cancel"],
-    methods: {
-        onCancel() {
-            this.$emit("cancel");
-            this.$emit("close");
-        },
-        onConfirm() {
-            this.$emit("confirm");
-        },
-    },
-};
-</script>
 
 <style scoped>
 /* Pequenos estilos de fallback caso Tailwind não esteja ativo */

@@ -1,10 +1,3 @@
-<template>
-    <div
-        class="markdown-renderer prose max-w-full break-words whitespace-pre-wrap"
-        v-html="sanitizedHtml"
-    ></div>
-</template>
-
 <script>
 // Small built-in Markdown renderer + sanitizer (no external deps)
 function escapeHtml(str) {
@@ -147,3 +140,10 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div
+        class="markdown-renderer prose max-w-full break-words whitespace-pre-wrap"
+        v-html="sanitizedHtml"
+    ></div>
+</template>

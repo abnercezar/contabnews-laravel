@@ -1,3 +1,9 @@
+<script>
+export default {
+    name: "NotificationGreenIcon",
+};
+</script>
+
 <template>
     <div class="flex items-center gap-1">
         <svg
@@ -17,8 +23,3 @@
         <span class="text-xs font-bold text-green-500">0</span>
     </div>
 </template>
-<script>
-export default {
-    name: "NotificationGreenIcon",
-};
-</script>

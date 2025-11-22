@@ -1,3 +1,65 @@
+<script setup>
+import { reactive, ref } from "vue";
+import { useAuthStore } from "../stores/auth";
+import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+
+const form = reactive({
+    email: "",
+    password: "",
+});
+const showPassword = ref(false);
+const loading = ref(false);
+const error = ref("");
+const success = ref("");
+
+async function login() {
+    error.value = "";
+    success.value = "";
+    loading.value = true;
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            success.value = data.message || "Login realizado com sucesso!";
+            // Salva token no localStorage (usado pelo cliente para chamar APIs protegidas)
+            if (data.token) {
+                // usa a store do Pinia para centralizar token e buscar o usuário
+                try {
+                    const auth = useAuthStore();
+                    await auth.loginWithToken(data.token);
+                } catch (e) {
+                    // fallback para localStorage caso o Pinia não esteja disponível
+                    try {
+                        localStorage.setItem("token", data.token);
+                    } catch (e) {}
+                }
+            }
+            // Redireciona para o caminho pretendido (se houver) ou para home
+            try {
+                const intended = localStorage.getItem("intendedPath");
+                if (intended) {
+                    localStorage.removeItem("intendedPath");
+                    window.location.href = intended;
+                } else {
+                    window.location.href = "/";
+                }
+            } catch (e) {
+                window.location.href = "/";
+            }
+        } else {
+            error.value = data.message || "Erro ao fazer login.";
+        }
+    } catch (e) {
+        error.value = "Erro de conexão com o servidor.";
+    }
+    loading.value = false;
+}
+</script>
+
 <template>
     <div
         class="min-h-screen flex flex-col justify-center items-center bg-gray-50"
@@ -101,68 +163,6 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import { reactive, ref } from "vue";
-import { useAuthStore } from "../stores/auth";
-import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
-
-const form = reactive({
-    email: "",
-    password: "",
-});
-const showPassword = ref(false);
-const loading = ref(false);
-const error = ref("");
-const success = ref("");
-
-async function login() {
-    error.value = "";
-    success.value = "";
-    loading.value = true;
-    try {
-        const response = await fetch("/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        });
-        const data = await response.json();
-        if (response.ok) {
-            success.value = data.message || "Login realizado com sucesso!";
-            // Salva token no localStorage (usado pelo cliente para chamar APIs protegidas)
-            if (data.token) {
-                // usa a store do Pinia para centralizar token e buscar o usuário
-                try {
-                    const auth = useAuthStore();
-                    await auth.loginWithToken(data.token);
-                } catch (e) {
-                    // fallback para localStorage caso o Pinia não esteja disponível
-                    try {
-                        localStorage.setItem("token", data.token);
-                    } catch (e) {}
-                }
-            }
-            // Redireciona para o caminho pretendido (se houver) ou para home
-            try {
-                const intended = localStorage.getItem("intendedPath");
-                if (intended) {
-                    localStorage.removeItem("intendedPath");
-                    window.location.href = intended;
-                } else {
-                    window.location.href = "/";
-                }
-            } catch (e) {
-                window.location.href = "/";
-            }
-        } else {
-            error.value = data.message || "Erro ao fazer login.";
-        }
-    } catch (e) {
-        error.value = "Erro de conexão com o servidor.";
-    }
-    loading.value = false;
-}
-</script>
 
 <style scoped>
 /* Personalize se necessário */

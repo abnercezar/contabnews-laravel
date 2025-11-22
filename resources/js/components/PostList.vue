@@ -1,86 +1,3 @@
-<template>
-    <div :class="filter === 'Todos' ? 'text-center' : 'text-left'">
-        <!-- Lista genérica: muda conforme a aba -->
-        <div v-if="filter === 'Todos'" class="space-y-2">
-            <div
-                v-for="(item, index) in itemsToRender"
-                :key="index"
-                class="pb-1"
-            >
-                <div class="mx-auto max-w-2xl text-left">
-                    <!-- Título (linkável) com numeração -->
-                    <div class="flex items-start gap-3">
-                        <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
-                        <a
-                            :href="itemUrl(item)"
-                            class="block text-base font-semibold text-gray-900 hover:text-blue-600"
-                            @click="handleOpen(item, $event)"
-                        >
-                            {{ item.title }}
-                        </a>
-                    </div>
-
-                    <!-- Conteúdo do comentário -->
-                    <!-- Rodapé com tabcoins, autor e tempo (comentários removidos conforme solicitado) -->
-                    <div
-                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap pl-10"
-                    >
-                        <span>{{ item.tabcoins }} tabcoin</span>
-                        <span>·</span>
-                        <span v-if="authorLabel(item)">{{ authorLabel(item) }}</span>
-                        <span v-if="authorLabel(item)">·</span>
-                        <span>{{ item.time }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Outras abas (ex: Publicações, Comentários, etc) -->
-        <div v-else class="space-y-1">
-            <div
-                v-for="(post, index) in posts"
-                :key="index"
-                class="pb-1 relative"
-            >
-                <div class="mx-auto max-w-2xl text-left">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-start gap-3">
-                            <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
-                            <a
-                                :href="itemUrl(post)"
-                                class="block text-base font-semibold text-gray-900 hover:text-blue-600"
-                                @click="handleOpen(post, $event)"
-                            >
-                                {{ post.title }}
-                            </a>
-                        </div>
-
-                        <!-- menu moved to Content page (three-dots now shown in content view) -->
-                    </div>
-
-                    <div
-                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap pl-10"
-                    >
-                        <span>{{ tabcoinsLabel(post) }}</span>
-                        <span>·</span>
-                        <span>{{ authorLabel(post) }}</span>
-                        <span>·</span>
-                        <span>{{ timeLabel(post) }}</span>
-                        <!-- Badge visual para posts patrocinados -->
-                        <span
-                            v-if="isSponsored(post)"
-                            class="ml-2 inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full"
-                            >Anúncio</span
-                        >
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- edit modal moved to Content page -->
-    </div>
-</template>
-
 <script>
 import axios from "axios";
 import { usePostsStore } from "../stores/posts";
@@ -288,3 +205,92 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div :class="filter === 'Todos' ? 'text-center' : 'text-left'">
+        <!-- Lista genérica: muda conforme a aba -->
+        <div v-if="filter === 'Todos'" class="space-y-2">
+            <div
+                v-for="(item, index) in itemsToRender"
+                :key="index"
+                class="pb-1"
+            >
+                <div class="mx-auto max-w-2xl text-left">
+                    <!-- Título (linkável) com numeração -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-gray-700 w-8 text-right font-bold"
+                            >{{ index + 1 }}.</span
+                        >
+                        <a
+                            :href="itemUrl(item)"
+                            class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                            @click="handleOpen(item, $event)"
+                        >
+                            {{ item.title }}
+                        </a>
+                    </div>
+
+                    <!-- Conteúdo do comentário -->
+                    <!-- Rodapé com tabcoins, autor e tempo (comentários removidos conforme solicitado) -->
+                    <div
+                        class="text-sm text-gray-500 mt-2 flex items-center gap-2 flex-wrap pl-10"
+                    >
+                        <span>{{ item.tabcoins }} tabcoin</span>
+                        <span>·</span>
+                        <span v-if="authorLabel(item)">{{
+                            authorLabel(item)
+                        }}</span>
+                        <span v-if="authorLabel(item)">·</span>
+                        <span>{{ item.time }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras abas (ex: Publicações, Comentários, etc) -->
+        <div v-else class="space-y-1">
+            <div
+                v-for="(post, index) in posts"
+                :key="index"
+                class="pb-1 relative"
+            >
+                <div class="mx-auto max-w-2xl text-left">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3">
+                            <span class="text-gray-700 w-8 text-right font-bold"
+                                >{{ index + 1 }}.</span
+                            >
+                            <a
+                                :href="itemUrl(post)"
+                                class="block text-base font-semibold text-gray-900 hover:text-blue-600"
+                                @click="handleOpen(post, $event)"
+                            >
+                                {{ post.title }}
+                            </a>
+                        </div>
+
+                        <!-- menu moved to Content page (three-dots now shown in content view) -->
+                    </div>
+
+                    <div
+                        class="text-sm text-gray-500 mt-1 flex items-center gap-2 flex-wrap pl-10"
+                    >
+                        <span>{{ tabcoinsLabel(post) }}</span>
+                        <span>·</span>
+                        <span>{{ authorLabel(post) }}</span>
+                        <span>·</span>
+                        <span>{{ timeLabel(post) }}</span>
+                        <!-- Badge visual para posts patrocinados -->
+                        <span
+                            v-if="isSponsored(post)"
+                            class="ml-2 inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full"
+                            >Anúncio</span
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- edit modal moved to Content page -->
+    </div>
+</template>
