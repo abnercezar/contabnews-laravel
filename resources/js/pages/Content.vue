@@ -664,12 +664,14 @@ export default {
                         <div
                             v-if="!showReply"
                             @click="openReply"
-                            class="reply-card cursor-pointer rounded border border-gray-200 bg-white p-4 flex items-center justify-between"
+                            class="reply-card cursor-pointer rounded border border-gray-200 bg-white p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                         >
-                            <div class="flex items-center gap-3">
+                            <div
+                                class="flex items-center gap-3 w-full sm:w-auto"
+                            >
                                 <button
                                     @click.stop="openReply"
-                                    class="px-4 py-2 bg-white border rounded font-medium"
+                                    class="px-4 py-2 bg-white border rounded font-medium w-full sm:w-auto text-left"
                                 >
                                     Responder
                                 </button>

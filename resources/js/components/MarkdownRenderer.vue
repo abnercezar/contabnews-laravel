@@ -1,5 +1,8 @@
 <template>
-    <div class="markdown-renderer prose" v-html="sanitizedHtml"></div>
+    <div
+        class="markdown-renderer prose max-w-full break-words whitespace-pre-wrap"
+        v-html="sanitizedHtml"
+    ></div>
 </template>
 
 <script>
@@ -144,68 +147,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.markdown-renderer {
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial;
-    color: #111827;
-    line-height: 1.7;
-}
-.markdown-renderer h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin: 0.67em 0;
-}
-.markdown-renderer h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0.75em 0;
-}
-.markdown-renderer h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0.75em 0;
-}
-.markdown-renderer p {
-    margin: 0.6em 0;
-}
-.markdown-renderer blockquote {
-    border-left: 4px solid #374151;
-    padding-left: 1rem;
-    color: #374151;
-    background: #f8fafc;
-    margin: 0.75em 0;
-}
-.markdown-renderer code {
-    background: #f3f4f6;
-    padding: 0.15rem 0.3rem;
-    border-radius: 4px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
-        "Courier New", monospace;
-}
-.markdown-renderer pre {
-    background: #f3f4f6;
-    padding: 0.75rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
-        "Courier New", monospace;
-}
-.markdown-renderer a {
-    color: #0366d6;
-    text-decoration: underline;
-}
-.markdown-renderer img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 6px;
-}
-.markdown-renderer ul,
-.markdown-renderer ol {
-    margin: 0.5em 0 0.5em 1.25em;
-}
-.markdown-renderer li {
-    margin: 0.25em 0;
-}
-</style>

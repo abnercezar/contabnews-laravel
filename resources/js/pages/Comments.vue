@@ -353,7 +353,7 @@ export default {
                 ></div>
 
                 <div
-                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 animate-pop"
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 sm:mx-auto p-6 animate-pop"
                 >
                     <!-- Header do comentário -->
                     <div class="flex items-start justify-between">

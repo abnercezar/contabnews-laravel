@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="handleSubmit" class="w-full">
         <div>
             <label for="title">Título</label>
             <input v-model="form.title" id="title" required />

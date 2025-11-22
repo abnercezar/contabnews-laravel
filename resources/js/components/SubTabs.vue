@@ -48,27 +48,37 @@ export default {
                 }
             }
         },
+        shortLabel(sub) {
+            const map = {
+                Publicações: "Pub",
+                Comentários: "Com",
+                Classificados: "Class",
+                Todos: "Todos",
+            };
+            return map[sub] || sub;
+        },
     },
 };
 </script>
 
 <template>
     <div class="bg-transparent mt-4">
-        <div class="container mx-auto px-4">
+            <div class="container mx-auto px-4">
             <div class="border-b border-gray-200">
-                <div class="flex justify-center -mb-px space-x-2">
+                <div class="flex justify-center -mb-px space-x-2 sm:overflow-visible overflow-x-auto whitespace-nowrap px-2">
                     <button
                         v-for="sub in subTabs"
                         :key="sub"
                         @click="selectSubTab(sub)"
-                        class="px-4 py-2 text-sm font-medium transition"
+                        class="inline-block whitespace-nowrap px-3 sm:px-4 py-2 text-sm font-medium transition"
                         :class="
                             activeSubTab === sub
                                 ? 'bg-white text-gray-700 border border-gray-200 border-b-0 rounded-t-md -mb-1'
                                 : 'text-gray-600 hover:text-gray-800'
                         "
                     >
-                        {{ sub }}
+                        <span class="hidden sm:inline">{{ sub }}</span>
+                        <span class="inline sm:hidden">{{ shortLabel(sub) }}</span>
                     </button>
                 </div>
             </div>
