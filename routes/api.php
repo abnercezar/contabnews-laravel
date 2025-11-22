@@ -31,6 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    // Atualizar perfil do usuário autenticado
+    Route::put('user', [\App\Http\Controllers\UserProfileController::class, 'update']);
+    Route::patch('user', [\App\Http\Controllers\UserProfileController::class, 'update']);
+
     // Logout
     Route::post('logout', [AuthController::class, 'logout']);
     // reações (upvote/downvote)

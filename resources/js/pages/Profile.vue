@@ -1,97 +1,69 @@
 <script>
 import ConTabNewsIcon from "../components/ConTabNewsIcon.vue";
+import ProfileEdit from "../components/ProfileEdit.vue";
+import { useAuthStore } from "../stores/auth";
+import { ref, onMounted } from "vue";
+
 export default {
     name: "Profile",
-    components: { ConTabNewsIcon },
+    components: { ConTabNewsIcon, ProfileEdit },
+    setup() {
+        const auth = useAuthStore();
+        const editMode = ref(false);
+
+        onMounted(() => {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get("edit") === "1") {
+                    editMode.value = true;
+                }
+            } catch (e) {}
+        });
+
+        const handleSaved = (user) => {
+            try {
+                // atualiza store (ProfileEdit também atualiza, mas mantém por segurança)
+                if (auth) auth.user = user;
+                // remove param edit da URL
+                try {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete("edit");
+                    window.history.replaceState({}, "", url.toString());
+                } catch (e) {}
+            } finally {
+                editMode.value = false;
+            }
+        };
+
+        return { auth, editMode, handleSaved };
+    },
 };
 </script>
 
 <template>
     <div class="min-h-screen bg-white flex flex-col">
         <div class="flex-1 flex flex-col items-center mt-8">
-            <div class="w-full max-w-4xl p-8 mb-8 mx-4 sm:mx-auto">
-                <h1 class="text-2xl font-bold mb-2 text-gray-700 text-center">
-                    ACA
-                </h1>
-                <nav class="flex justify-center mb-6">
-                    <a
-                        href="/profile"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-t font-bold"
-                        >Perfil</a
-                    >
-                    <a
-                        href="/publications"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
-                        >Publicações</a
-                    >
-                    <a
-                        href="/comments"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
-                        >Comentários</a
-                    >
-                    <a
-                        href="/classifieds"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-t transition"
-                        >Classificados</a
-                    >
-                </nav>
-                <div class="flex flex-col items-center py-8">
-                    <h2
-                        class="text-2xl font-bold text-gray-700 mb-6 flex items-center gap-2"
-                    >
-                        <ConTabNewsIcon
-                            style="width: 28px; height: 28px; fill: #374151"
-                        />
-                        Perfil
-                    </h2>
-                    <div class="flex flex-col items-center gap-4 mb-4 w-full">
-                        <div
-                            class="flex items-center gap-2 bg-blue-50 rounded-lg px-4 py-2 w-full max-w-xs justify-between shadow"
+            <div class="w-full max-w-4xl p-8 mx-4 sm:mx-auto">
+                <div v-if="!editMode" class="p-4 bg-white rounded shadow">
+                    <h3 class="text-lg font-semibold mb-2">Dados</h3>
+                    <p><strong>Nome:</strong> {{ auth.user?.name }}</p>
+                    <p><strong>Email:</strong> {{ auth.user?.email }}</p>
+                    <div class="mt-4">
+                        <button
+                            @click="editMode = true"
+                            class="px-3 py-2 bg-[#ff7b00] text-white rounded"
                         >
-                            <span
-                                class="text-blue-900 font-bold text-lg flex items-center gap-1"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    fill="#1e40af"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <text
-                                        x="12"
-                                        y="16"
-                                        text-anchor="middle"
-                                        font-size="12"
-                                        fill="#fff"
-                                    >
-                                        TC$
-                                    </text>
-                                </svg>
-                                0 TabCash
-                            </span>
-                        </div>
-                        <div
-                            class="flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-2 w-full max-w-xs justify-between shadow"
-                        >
-                            <span
-                                class="text-gray-700 font-semibold text-base flex items-center gap-1"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="18"
-                                    height="18"
-                                    fill="#64748b"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M12 8v4l3 2" />
-                                </svg>
-                                Membro há 11 meses
-                            </span>
-                        </div>
+                            Editar perfil
+                        </button>
                     </div>
                 </div>
+
+                <ProfileEdit
+                    v-if="editMode"
+                    :initial="auth.user"
+                    @saved="handleSaved"
+                    @cancel="editMode = false"
+                />
             </div>
         </div>
     </div>

@@ -1,28 +1,39 @@
 <template>
-    <div class="w-full">
-        <div class="flex gap-2 mb-2 flex-wrap">
-            <button type="button" @click="insert('# ')">
-                <strong>H</strong>
-            </button>
-            <button type="button" @click="wrap('**')">
-                <strong>B</strong>
-            </button>
-            <button type="button" @click="wrap('*')"><em>I</em></button>
-            <button type="button" @click="wrap('> ')">❝</button>
-            <button type="button" @click="wrap('[', '](url)')">🔗</button>
-            <button type="button" @click="wrap('`')">&lt;/&gt;</button>
-            <button type="button" @click="wrap('```\n', '\n```')">
-                [code]
-            </button>
-            <button type="button" @click="insert('- ')">•</button>
-            <button type="button" @click="insert('1. ')">1.</button>
+    <div class="mt-2 border rounded bg-white">
+        <div
+            class="px-3 py-2 border-b bg-gray-50 flex items-center gap-2 text-gray-600"
+        >
+            <div class="flex gap-2 flex-wrap">
+                <button type="button" @click="insert('# ')">
+                    <strong>H</strong>
+                </button>
+                <button type="button" @click="wrap('**')">
+                    <strong>B</strong>
+                </button>
+                <button type="button" @click="wrap('*')"><em>I</em></button>
+                <button type="button" @click="wrap('> ')">❝</button>
+                <button type="button" @click="wrap('[', '](url)')">🔗</button>
+                <button type="button" @click="wrap('`')">&lt;/&gt;</button>
+                <button type="button" @click="wrap('```\n', '\n```')">
+                    [code]
+                </button>
+                <button type="button" @click="insert('- ')">•</button>
+                <button type="button" @click="insert('1. ')">1.</button>
+            </div>
+
+            <div class="ml-auto text-xs text-gray-500">
+                <slot name="header-right"></slot>
+            </div>
         </div>
-        <textarea
-            :value="modelValue"
-            @input="$emit('update:modelValue', $event.target.value)"
-            class="w-full min-h-[180px] border rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 bg-gray-50 resize-none"
-            :placeholder="placeholder"
-        ></textarea>
+
+        <div class="p-3">
+            <textarea
+                :value="modelValue"
+                @input="$emit('update:modelValue', $event.target.value)"
+                class="w-full min-h-[180px] p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 bg-white resize-none"
+                :placeholder="placeholder"
+            ></textarea>
+        </div>
     </div>
 </template>
 

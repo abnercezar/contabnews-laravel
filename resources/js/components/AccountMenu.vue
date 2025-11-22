@@ -125,6 +125,42 @@ export default {
                 return;
             }
 
+            if (item.label === "Editar perfil") {
+                this.showHamburgerMenu = false;
+                const isLogged = !!(this.auth && this.auth.token);
+                if (!isLogged) {
+                    try {
+                        localStorage.setItem("intendedPath", "/profile");
+                    } catch (e) {}
+                    try {
+                        if (
+                            this.$inertia &&
+                            typeof this.$inertia.visit === "function"
+                        ) {
+                            this.$inertia.visit("/login");
+                        } else {
+                            window.location.href = "/login";
+                        }
+                    } catch (e) {
+                        window.location.href = "/login";
+                    }
+                    return;
+                }
+                try {
+                    if (
+                        this.$inertia &&
+                        typeof this.$inertia.visit === "function"
+                    ) {
+                        this.$inertia.visit("/profile?edit=1");
+                    } else {
+                        window.location.href = "/profile?edit=1";
+                    }
+                } catch (e) {
+                    window.location.href = "/profile?edit=1";
+                }
+                return;
+            }
+
             this.showHamburgerMenu = false;
         },
     },

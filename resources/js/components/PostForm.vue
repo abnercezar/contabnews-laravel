@@ -12,7 +12,11 @@
             <MarkdownEditor
                 v-model="form.content"
                 placeholder="Digite o conteúdo..."
-            />
+            >
+                <template #header-right>
+                    {{ (form.content || "").length }}/5000
+                </template>
+            </MarkdownEditor>
             <div v-if="errors.content" class="field-error">
                 {{ errors.content[0] }}
             </div>

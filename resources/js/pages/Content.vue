@@ -62,13 +62,11 @@ export default {
                     );
                 }
                 if (commentObj) {
-                    const author = commentObj.user
-                        ? commentObj.user.name
-                        : "Anônimo";
                     const snippet = commentObj.body
                         ? commentObj.body.slice(0, 200)
                         : "";
-                    this.replyBody = `> ${author}: ${snippet}\n\n`;
+                    // include only the quoted snippet (no author prefix like 'Anônimo:')
+                    this.replyBody = snippet ? `> ${snippet}\n\n` : "";
                 }
                 this.replyingToCommentId = cid;
                 this.showReply = true;
@@ -182,11 +180,11 @@ export default {
                 // Se foi passado um comentário, responder a ele
                 if (comment) {
                     this.replyingToCommentId = comment.id;
-                    const author = comment.user ? comment.user.name : "Anônimo";
                     const snippet = comment.body
                         ? comment.body.slice(0, 200)
                         : "";
-                    this.replyBody = `> ${author}: ${snippet}\n\n`;
+                    // include only the quoted snippet (no author prefix)
+                    this.replyBody = snippet ? `> ${snippet}\n\n` : "";
                 }
 
                 this.showReply = true;
@@ -588,7 +586,13 @@ export default {
                                 <MarkdownEditor
                                     v-model="editPost.content"
                                     placeholder="Conteúdo da publicação"
-                                />
+                                >
+                                    <template #header-right>
+                                        {{
+                                            (editPost.content || "").length
+                                        }}/5000
+                                    </template>
+                                </MarkdownEditor>
                                 <div
                                     v-if="editErrors.content"
                                     class="text-red-600 text-sm mt-1"
@@ -681,14 +685,12 @@ export default {
                         </div>
 
                         <!-- Editor (substitui o card) -->
-                        <div
-                            v-else
-                            class="mt-0 border border-gray-200 rounded p-4 bg-white"
-                        >
-                            <MarkdownEditor
-                                ref="mdEditor"
-                                v-model="replyBody"
-                            />
+                        <div v-else class="mt-0">
+                            <MarkdownEditor ref="mdEditor" v-model="replyBody">
+                                <template #header-right>
+                                    {{ (replyBody || "").length }}/5000
+                                </template>
+                            </MarkdownEditor>
                             <div
                                 class="mt-2 flex items-center justify-end gap-2"
                             >

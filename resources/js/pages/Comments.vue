@@ -1,5 +1,6 @@
 <script>
 import Modal from "../components/Modal.vue";
+import InlineToast from "../components/InlineToast.vue";
 import MarkdownEditor from "../components/MarkdownEditor.vue";
 import { useCommentsStore } from "../stores/comments";
 import { useAuthStore } from "../stores/auth";
@@ -10,6 +11,7 @@ export default {
     components: {
         Modal,
         MarkdownEditor,
+        InlineToast,
     },
     setup() {
         const commentsStore = useCommentsStore();
@@ -37,6 +39,8 @@ export default {
             commentDeleteTarget: null,
             commentDeleteLoading: false,
             commentDeleteError: "",
+            toastMessage: "",
+            showToast: false,
             // controle de qual comentário tem o menu aberto (id)
             showMenuFor: null,
             // (inline expansion/inline reply removed)
@@ -278,8 +282,10 @@ export default {
                 else {
                     navigator.clipboard.writeText(url);
                     try {
-                        // rápido feedback
-                        alert("Link do comentário copiado");
+                        // rápido feedback via InlineToast
+                        this.toastMessage = "Link do comentário copiado";
+                        this.showToast = true;
+                        setTimeout(() => (this.showToast = false), 2500);
                     } catch (e) {}
                 }
             } catch (e) {
@@ -322,9 +328,12 @@ export default {
                 class="block pb-1 rounded-md px-2 hover:bg-gray-50 transition-all duration-150 cursor-pointer group"
             >
                 <div class="flex items-start gap-3">
-                    <span class="text-gray-700 w-8 text-right font-bold">{{ index + 1 }}.</span>
+                    <span
+                        class="text-gray-700 w-8 text-right font-bold self-start flex-shrink-0 leading-tight"
+                        >{{ index + 1 }}.</span
+                    >
                     <p
-                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700"
+                        class="text-gray-800 leading-relaxed text-base group-hover:text-blue-700 flex-1 min-w-0"
                     >
                         {{ comment.body }}
                     </p>
@@ -427,7 +436,11 @@ export default {
                         ✏️ Editar comentário
                     </h3>
 
-                    <MarkdownEditor v-model="commentEdit.body" />
+                    <MarkdownEditor v-model="commentEdit.body">
+                        <template #header-right>
+                            {{ (commentEdit.body || "").length }}/5000
+                        </template>
+                    </MarkdownEditor>
 
                     <div
                         v-if="commentEditErrors.body"
@@ -489,6 +502,7 @@ export default {
                 </div>
             </div>
         </Modal>
+        <InlineToast :message="toastMessage" :visible="showToast" />
     </div>
 </template>
 
