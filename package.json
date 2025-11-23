@@ -2,9 +2,11 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "predev": "npm run test:back && npm run test:unit",
+        "test:back": "php artisan test",
+        "dev": "vite",
         "build": "vite build",
         "build:ssr": "vite build && vite build --ssr",
-        "dev": "vite",
         "commit": "npx cz",
         "test": "npm run test:unit",
         "test:unit": "vitest run",
